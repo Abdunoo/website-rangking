@@ -1,33 +1,38 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import Header from './components/Header.vue';
+
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <section class="min-h-screen">
+    <Header />
+    <main class="min-h-screen mt-16 w-full h-full bg-white flex justify-center px-40">
+      <router-view />
+    </main>
+  </section>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
 </template>
 
+<script>
+export default {
+  name: 'App',
+  components: {
+    Header,
+  },
+}
+</script>
+
 <style scoped>
-header {
+/* header {
   line-height: 1.5;
 }
 
 .logo {
   display: block;
   margin: 0 auto 2rem;
-}
+} */
 
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   header {
     display: flex;
     place-items: center;
@@ -42,6 +47,7 @@ header {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;
-  }
-}
+  } 
+
+/* } */
 </style>

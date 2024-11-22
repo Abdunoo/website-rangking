@@ -28,30 +28,29 @@ class DatabaseSeeder extends Seeder
             'credits' => 500
         ]);
 
-        // Categories for websites
+        // Example data for websites
         $categories = ['Technology', 'Business', 'Health', 'Education', 'Sports'];
 
-        // List of sample business words for domain generation
+        // Create more realistic domains and website names
         $businessWords = [
             'tech', 'hub', 'lab', 'solutions', 'ventures', 'group', 'systems', 'digital', 'world', 'inc', 'network',
             'consulting', 'global', 'media', 'innovations', 'partners', 'corp', 'analytics', 'apps', 'edge', 'ideas'
         ];
 
-        // List of common TLDs
         $tlds = ['.com', '.net', '.org', '.io', '.co', '.ai', '.tech', '.biz', '.org'];
 
-        // Generate 100 different domains dynamically
-        $domains = [];
+        // Generate 100 different domains and website names
         for ($i = 1; $i <= 100; $i++) {
-            // Generate a realistic domain using random business words and TLDs
+            // Generate realistic domain name
             $domain = $businessWords[array_rand($businessWords)] . rand(1, 99) . $tlds[array_rand($tlds)];
-            $domains[] = strtolower($domain);
-        }
 
-        // Create 100 websites with unique domains
-        for ($i = 1; $i <= 100; $i++) {
+            // Website name can be based on the domain name (removing TLD and making it more readable)
+            $websiteName = ucfirst(str_replace(['.com', '.net', '.org', '.io', '.co', '.ai', '.tech', '.biz'], '', $domain));
+
+            // Create a website entry
             $website = Website::create([
-                'domain' => $domains[$i - 1],  // Select the domain from the array
+                'domain' => $domain,
+                'name' => $websiteName,  // Assign the website name
                 'category' => $categories[array_rand($categories)],  // Random category
                 'rank' => rand(1, 1000),  // Random rank
                 'rank_change' => rand(-10, 10),  // Random rank change

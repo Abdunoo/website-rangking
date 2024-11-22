@@ -13,7 +13,7 @@ class WebsiteController extends Controller
     public function index(Request $request)
     {
         $websites = Website::orderBy('rank', 'asc')
-            ->paginate(50); // Tampilkan 50 data per halaman
+            ->paginate(50);
 
         return response()->json([
             'message' => 'Websites retrieved successfully.',
