@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 // Website routes
 Route::get('/websites', [WebsiteController::class, 'index']);
 Route::get('/websites/{website}', [WebsiteController::class, 'show']);
+Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Credit routes

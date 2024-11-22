@@ -6,7 +6,7 @@ import Header from './components/Header.vue';
 <template>
   <section class="min-h-screen">
     <Header />
-    <main class="min-h-screen mt-16 w-full h-full bg-white flex justify-center px-40">
+    <main class="min-h-screen mt-16 w-full h-full bg-white flex justify-center md:px-40">
       <router-view />
     </main>
   </section>

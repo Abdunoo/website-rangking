@@ -7,7 +7,7 @@
           <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path>
         </svg>
       </div>
-      <h2 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em]">Websites</h2>
+      <h2 class="hidden md:flex text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em]">Websites</h2>
     </div>
     <div class="flex flex-1 justify-end gap-8">
       <label class="flex flex-col min-w-40 !h-10 max-w-64">

@@ -33,6 +33,18 @@ class WebsiteController extends Controller
     }
 
     /**
+     * Show details of a specific website.
+     */
+    public function byName($websiteName)
+    {
+        $website = Website::where('name', $websiteName)->firstOrFail();
+        return response()->json([
+            'message' => 'Website details retrieved successfully.',
+            'data' => $website,
+        ]);
+    }
+
+    /**
      * Update a website's details (admin-only).
      */
     public function update(Request $request, Website $website)
