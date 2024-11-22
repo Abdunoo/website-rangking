@@ -2,32 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApplicationResponse;
 use App\Models\Credit;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class CreditController extends Controller
 {
-    /**
-     * Display the user's credit history.
-     */
+    use ApplicationResponse;
+
     public function index(Request $request)
     {
         $user = $request->user();
         $credits = $user->credits()->latest()->get();
 
-        return response()->json([
-            'message' => 'Credit history retrieved successfully.',
-            'data' => $credits,
-        ]);
+        return $this->json(
+            200,
+            'Credit history retrieved successfully.',
+            $credits
+        );
     }
 
-    /**
-     * Add credits to a user account (admin-only).
-     */
     public function addCredits(Request $request, User $user)
     {
-        $this->authorize('admin'); // Pastikan pengguna adalah admin
+        $this->authorize('admin');
 
         $request->validate([
             'amount' => 'required|integer|min:1',
@@ -42,15 +40,13 @@ class CreditController extends Controller
             'description' => $request->description,
         ]);
 
-        return response()->json([
-            'message' => 'Credits added successfully.',
-            'data' => $credit,
-        ], 201);
+        return $this->json(
+            200,
+            'Credits added successfully.',
+            $credit,
+        );
     }
 
-    /**
-     * Deduct credits from a user account.
-     */
     public function deductCredits(Request $request, User $user)
     {
         $request->validate([
@@ -59,9 +55,10 @@ class CreditController extends Controller
         ]);
 
         if ($user->credits < $request->amount) {
-            return response()->json([
-                'message' => 'Insufficient credits.',
-            ], 400);
+            return $this->json(
+                400,
+                'Insufficient credits.',
+            );
         }
 
         $user->decrement('credits', $request->amount);
@@ -72,9 +69,10 @@ class CreditController extends Controller
             'description' => $request->description,
         ]);
 
-        return response()->json([
-            'message' => 'Credits deducted successfully.',
-            'data' => $credit,
-        ], 201);
+        return $this->json(
+            200,
+            'Credits deducted successfully.',
+            $credit,
+        );
     }
 }

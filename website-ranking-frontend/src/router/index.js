@@ -8,8 +8,18 @@ const routes = [
   },
   {
     path: "/:domain_name",
-    name: "Domain",
-    component: () => import("@/view/Domain.vue")
+    name: "Website",
+    component: () => import("@/view/Website.vue")
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("@/view/Login.vue")
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: () => import("@/view/Register.vue")
   }
 
 ];

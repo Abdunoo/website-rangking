@@ -2,81 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApplicationResponse;
 use App\Models\Website;
 use Illuminate\Http\Request;
 
 class WebsiteController extends Controller
 {
+    use ApplicationResponse;
+
     /**
-     * Display a paginated list of websites with ranks.
+     * Display a listing of websites.
      */
     public function index(Request $request)
     {
-        $websites = Website::orderBy('rank', 'asc')
+        $websites = Website::where('domain', 'LIKE', '%' . $request->input('search', '') . '%')
+            ->orderBy('rank', 'asc')
             ->paginate(50);
 
-        return response()->json([
-            'message' => 'Websites retrieved successfully.',
-            'data' => $websites,
-        ]);
+        return $this->json(
+            200,
+            'Websites retrieved successfully.',
+            $websites
+        );
     }
 
     /**
-     * Show details of a specific website.
+     * Store a new website.
      */
-    public function show(Website $website)
+    public function store(Request $request)
     {
-        return response()->json([
-            'message' => 'Website details retrieved successfully.',
-            'data' => $website,
+        $request->validate([
+            'domain' => 'required|string|max:255|unique:websites',
+            'rank' => 'required|integer',
         ]);
+
+        $website = Website::create($request->all());
+
+        return $this->json(
+            200,
+            'Website created successfully.',
+            $website,
+        );
     }
 
     /**
-     * Show details of a specific website.
-     */
-    public function byName($websiteName)
-    {
-        $website = Website::where('name', $websiteName)->firstOrFail();
-        return response()->json([
-            'message' => 'Website details retrieved successfully.',
-            'data' => $website,
-        ]);
-    }
-
-    /**
-     * Update a website's details (admin-only).
+     * Update an existing website.
      */
     public function update(Request $request, Website $website)
     {
-        $this->authorize('admin'); // Pastikan pengguna adalah admin
-
         $request->validate([
-            'domain' => 'sometimes|string|max:255',
-            'category' => 'sometimes|string|max:255',
-            'rank' => 'sometimes|integer|min:1',
-            'rank_change' => 'sometimes|integer',
+            'domain' => 'required|string|max:255|unique:websites,domain,' . $website->id,
+            'rank' => 'required|integer',
         ]);
 
         $website->update($request->all());
 
-        return response()->json([
-            'message' => 'Website updated successfully.',
-            'data' => $website,
-        ]);
+        return $this->json(
+            200,
+            'Website updated successfully.',
+            $website
+        );
     }
 
     /**
-     * Delete a website (admin-only).
+     * Remove a website.
      */
     public function destroy(Website $website)
     {
-        $this->authorize('admin'); // Pastikan pengguna adalah admin
-
         $website->delete();
 
-        return response()->json([
-            'message' => 'Website deleted successfully.',
-        ]);
+        return $this->json(
+            200,
+            'Website deleted successfully.'
+        );
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
 
+// Login routes
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Website routes
 Route::get('/websites', [WebsiteController::class, 'index']);

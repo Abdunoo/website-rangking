@@ -1,0 +1,25 @@
+.bg-primary {
+  background-color: #019863;
+  
+}
+
+.text-primary {
+  color: #019863; 
+}
+
+.text-secondary {
+  /* color: #d0bb95;  */
+  color: #4CAF50; 
+}
+
+.text-success {
+  color: #019863; 
+}
+
+.text-danger {
+  color: #a80f1e; 
+}
+
+.hover-bg-primary:hover {
+  background-color: #04a96f; 
+}

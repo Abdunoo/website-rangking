@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('category');
             $table->integer('rank');
-            $table->integer('rank_change')->default(0);
+            $table->integer('previous_rank');
             $table->timestamps();
         });
     }

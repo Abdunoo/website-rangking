@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApplicationResponse;
 use App\Models\Contact;
 use App\Models\Website;
 use Illuminate\Http\Request;
@@ -9,54 +10,38 @@ use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
-    /**
-     * Display a listing of the contacts for a specific website.
-     */
+    use ApplicationResponse;
+
     public function index(Website $website)
-    {
-        $contacts = $website->contacts;
+{
+    $contacts = $website->contacts;
 
-        return response()->json([
-            'message' => 'Contacts retrieved successfully.',
-            'data' => $contacts,
-        ]);
-    }
+    return $this->json(
+        200,
+        'Contacts retrieved successfully.',
+        $contacts
+    );
+}
 
-    /**
-     * Store a newly created contact in storage.
-     */
-    public function store(Request $request, Website $website)
-    {
-        $request->validate([
-            'type' => 'required|string|max:50',
-            'value' => 'required|string|max:255',
-        ]);
+public function store(Request $request, Website $website)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'message' => 'required|string',
+    ]);
 
-        $contact = $website->contacts()->create([
-            'type' => $request->type,
-            'value' => $request->value,
-            'user_id' => Auth::id(),
-        ]);
+    $contact = Contact::create([
+        'website_id' => $website->id,
+        'name' => $request->name,
+        'email' => $request->email,
+        'message' => $request->message,
+    ]);
 
-        return response()->json([
-            'message' => 'Contact added successfully.',
-            'data' => $contact,
-        ], 201);
-    }
-
-    /**
-     * Remove the specified contact.
-     */
-    public function destroy(Contact $contact)
-    {
-        if ($contact->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $contact->delete();
-
-        return response()->json([
-            'message' => 'Contact deleted successfully.',
-        ]);
-    }
+    return $this->json(
+        201,
+        'Contact submitted successfully.',
+        $contact,
+    );
+}
 }

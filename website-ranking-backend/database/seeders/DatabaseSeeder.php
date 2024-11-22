@@ -5,6 +5,7 @@ use App\Models\Credit;
 use App\Models\User;
 use App\Models\Website;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -28,40 +29,40 @@ class DatabaseSeeder extends Seeder
             'credits' => 500
         ]);
 
-        // Example data for websites
-        $categories = ['Technology', 'Business', 'Health', 'Education', 'Sports'];
+        $filePath = storage_path('app/top-1m.csv');
+        $batchSize = 1000;
 
-        // Create more realistic domains and website names
-        $businessWords = [
-            'tech', 'hub', 'lab', 'solutions', 'ventures', 'group', 'systems', 'digital', 'world', 'inc', 'network',
-            'consulting', 'global', 'media', 'innovations', 'partners', 'corp', 'analytics', 'apps', 'edge', 'ideas'
-        ];
+        if (!file_exists($filePath)) {
+            $this->command->error("File top-1m.csv tidak ditemukan di storage/app/");
+            return;
+        }
 
-        $tlds = ['.com', '.net', '.org', '.io', '.co', '.ai', '.tech', '.biz', '.org'];
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            $this->command->error("Gagal membuka file.");
+            return;
+        }
 
-        // Generate 100 different domains and website names
-        for ($i = 1; $i <= 100; $i++) {
-            // Generate realistic domain name
-            $domain = $businessWords[array_rand($businessWords)] . rand(1, 99) . $tlds[array_rand($tlds)];
+        $data = [];
+        while (($line = fgetcsv($handle)) !== false) {
+            $rank = $line[0];
+            $domain = $line[1];
 
-            // Website name can be based on the domain name (removing TLD and making it more readable)
-            $websiteName = ucfirst(str_replace(['.com', '.net', '.org', '.io', '.co', '.ai', '.tech', '.biz'], '', $domain));
-
-            // Create a website entry
             $website = Website::create([
+                'rank' => $rank,
+                'previous_rank' => $rank,
                 'domain' => $domain,
-                'name' => $websiteName,  // Assign the website name
-                'category' => $categories[array_rand($categories)],  // Random category
-                'rank' => rand(1, 1000),  // Random rank
-                'rank_change' => rand(-10, 10),  // Random rank change
+                'name' => ucfirst(explode('.', $domain)[0]),
+                'rating' => rand(0, 50) / 10, // Generate a random rating between 0.0 and 5.0
+                'category' => 'Uncategorized',
             ]);
 
-            // Add two contacts for each website
+            // Tambahkan dua kontak untuk setiap website
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'email',
-                'value' => 'contact' . $i . '@' . $website->domain,
-                'user_id' => rand(1, 2) // Assuming user IDs 1 and 2 exist
+                'value' => 'contact' . $rank . '@' . $domain,
+                'user_id' => rand(1, 2) // Asumsi user_id 1 dan 2 ada
             ]);
 
             Contact::create([
@@ -70,7 +71,16 @@ class DatabaseSeeder extends Seeder
                 'value' => '+123456789' . rand(1000, 9999),
                 'user_id' => rand(1, 2)
             ]);
+
+            if (count($data) >= $batchSize) {
+                DB::table('websites')->insert($data);
+                $data = [];
+                $this->command->info("Memasukkan $batchSize baris...");
+            }
         }
+
+        fclose($handle);
+        $this->command->info("Selesai mengimpor data.");
 
         Credit::create([
             'user_id' => 1, // Admin
