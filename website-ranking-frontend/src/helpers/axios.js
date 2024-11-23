@@ -1,5 +1,9 @@
 import router from '@/router';
 import axios from 'axios';
+import { ref } from 'vue';
+
+// Create a reactive loading state
+export const isLoading = ref(false);
 
 const getToken = () => {
   return localStorage.getItem('token'); 
@@ -12,8 +16,11 @@ const apiClient = axios.create({
   }
 });
 
+// Request interceptor to start loading
 apiClient.interceptors.request.use(
   (config) => {
+    isLoading.value = true;
+    
     const token = getToken();
     if (!config.headers.skipToken && token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -27,15 +34,19 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    isLoading.value = false;
     return Promise.reject(error);
   }
 );
 
+// Response interceptor to stop loading
 apiClient.interceptors.response.use(
   (response) => {
+    isLoading.value = false;
     return response.data;
   },
   (error) => {
+    isLoading.value = false;
     if (error.response && error.response.status === 401) {
       router.push('/login');
     }

@@ -19,22 +19,45 @@
       </RouterLink> -->
 
       <!-- Search Input -->
-      <div class="flex-grow max-w-xs mx-4">
+      <!-- <div class="flex-grow max-w-xs mx-4">
         <label class="block">
           <div class="flex items-center rounded-xl bg-[#f0f2f4]">
             <div class="pl-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                viewBox="0 0 256 256">
+                <path
+                  d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
+                </path>
               </svg>
             </div>
-            <input 
-              placeholder="Search"
-              class="w-full px-4 py-2 bg-[#f0f2f4] rounded-xl focus:outline-none"
-              v-model="searchQuery" 
-              @input="updateSearchQuery" 
-            />
+            <input placeholder="Search" class="w-full px-4 py-2 bg-[#f0f2f4] rounded-xl focus:outline-none"
+              v-model="searchQuery" @input="updateSearchQuery" />
           </div>
         </label>
+      </div> -->
+      <div class="flex-grow max-w-xs mx-4 relative">
+        <label class="block">
+          <div class="flex items-center rounded-xl bg-gray-100">
+            <div class="pl-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                viewBox="0 0 256 256">
+                <path
+                  d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
+                </path>
+              </svg>
+            </div>
+            <input placeholder="Search" class="w-full px-4 py-2 bg-gray-100 rounded-xl focus:outline-none"
+              v-model="searchQuery" @input="updateSearchQuery" />
+          </div>
+        </label>
+        <!-- Conditionally render search results only when not on home page -->
+        <div v-if="searchResults.length && !isHomePage"
+          class="absolute z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full shadow-lg">
+          <div v-for="result in searchResults" :key="result.id" class="p-2 hover:bg-gray-100 cursor-pointer"
+            @click="selectResult(result)">
+            {{ result.name }}
+          </div>
+        </div>
       </div>
 
       <!-- Credits Button -->
@@ -55,20 +78,15 @@
 
       <!-- Profile Dropdown -->
       <div class="hidden md:block relative" @click.stop="toggleDropdown">
-        <div 
-          class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 cursor-pointer"
+        <div class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 cursor-pointer"
           style='background-image: url("https://cdn.usegalileo.ai/stability/770ef02c-67a6-4814-b5eb-30c958e92f7f.png");'>
         </div>
 
         <!-- Dropdown menu -->
-        <transition 
-          enter-active-class="transition ease-out duration-100"
-          enter-from-class="transform opacity-0 scale-95" 
-          enter-to-class="transform opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-75" 
-          leave-from-class="transform opacity-100 scale-100"
-          leave-to-class="transform opacity-0 scale-95"
-        >
+        <transition enter-active-class="transition ease-out duration-100"
+          enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95">
           <div v-if="isDropdownOpen"
             class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
             <div class="py-1">
@@ -112,17 +130,44 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue';
+import apiClient from '@/helpers/axios';
+import router from '@/router';
+import { debounce } from 'lodash-es';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: 'Header',
   emits: ['update-search'],
   setup(props, { emit }) {
+    const route = useRoute();
     const searchQuery = ref('');
+    const searchResults = ref([]);
     const isDropdownOpen = ref(false);
 
-    const updateSearchQuery = () => {
+    // Computed property to check if current route is home page
+    const isHomePage = computed(() => route.path === '/');
+
+    const updateSearchQuery = debounce(async () => {
       emit('update-search', searchQuery.value);
+
+      if (searchQuery.value.length > 0 && !isHomePage.value) {
+        try {
+          const response = await apiClient.get(`/api/websites?search=${searchQuery.value}&limit=5`);
+          searchResults.value = response.data.data; // Adjust based on the API response structure
+        } catch (error) {
+          console.error("Search error:", error);
+          searchResults.value = [];
+        }
+      } else {
+        searchResults.value = [];
+      }
+    }, 500);
+
+    const selectResult = (result) => {
+      searchResults.value = [];
+      // router.removeRoute(route.name)
+      router.push(`/${result.name}`);
     };
 
     const toggleDropdown = () => {
@@ -145,9 +190,12 @@ export default {
 
     return {
       searchQuery,
+      searchResults,
       updateSearchQuery,
       isDropdownOpen,
       toggleDropdown,
+      selectResult,
+      isHomePage,
     };
   },
 };

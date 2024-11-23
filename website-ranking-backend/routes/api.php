@@ -14,9 +14,10 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 // Website routes
 Route::get('/websites', [WebsiteController::class, 'index']);
 Route::get('/websites/{website}', [WebsiteController::class, 'show']);
-Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
 
 Route::middleware('auth:sanctum')->group(function () {
+Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
+
     // Credit routes
     Route::get('/credits', [CreditController::class, 'index']);
     Route::post('/credits/add/{user}', [CreditController::class, 'addCredits']);

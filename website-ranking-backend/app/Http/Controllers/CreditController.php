@@ -62,6 +62,8 @@ class CreditController extends Controller
         }
 
         $user->decrement('credits', $request->amount);
+        $user->user_can_access_contact = 1;
+        $user->save();
 
         $credit = Credit::create([
             'user_id' => $user->id,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ApplicationResponse;
 use App\Models\Website;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -29,6 +30,7 @@ class WebsiteController extends Controller
     }
 
     public function byName($name) {
+        $user = Auth::user();
         $website = Website::with('contacts')->where('name', $name)->first();
         if (!$website) {
             return $this->json(
@@ -37,6 +39,8 @@ class WebsiteController extends Controller
                 null
             );
         }
+
+        $website->user = $user;
 
         return $this->json(
             200,

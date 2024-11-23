@@ -85,7 +85,7 @@
 
     <!-- User Reviews Section -->
     <section>
-      <h3 class="text-lg font-bold mb-4">User  Reviews</h3>
+      <h3 class="text-lg font-bold mb-4">User Reviews</h3>
 
       <div v-for="review in reviews" :key="review.id" class="mb-4 p-3 bg-gray-50 rounded-lg">
         <div class="flex items-center mb-2">
@@ -133,7 +133,7 @@
 
 <script>
 import apiClient from '@/helpers/axios';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router';
 
 export default {
@@ -149,6 +149,11 @@ export default {
       rating: 0
     });
 
+    const credit = ref({
+      amount: 100,
+      description: 'Payment get access view contact'
+    })
+
     const route = useRoute();
     const userHasAccess = ref(false);
     const rating = ref(4);
@@ -159,7 +164,7 @@ export default {
       try {
         const response = await apiClient.get(`api/websiteByName/${websiteName}`);
         website.value = response.data;
-        userHasAccess.value = response.data.userCanAccessContact || true;
+        userHasAccess.value = response.data.user.user_can_access_contact === 1;
         reviews.value = response.data.reviews || [];
       } catch (error) {
         console.error("Failed to fetch website details:", error);
@@ -168,26 +173,44 @@ export default {
 
     const submitReview = async () => {
       try {
-        await apiClient.post('api/reviews', {
-          websiteId: route.params.domain_name,
+        const response = await apiClient.post('api/reviews', {
+          websiteId: route.params.domain,
           rating: rating.value,
           comment: comment.value
         });
-        rating.value = 0;
-        comment.value = '';
-        // Optionally refresh reviews after submission
-        fetchWebsiteDetails(route.params.domain_name);
+        if (response.code === 200) {
+          rating.value = response.data.rating;
+          comment.value = response.data.comment;
+        }
       } catch (error) {
         console.error("Failed to submit review:", error);
       }
     };
 
-    const purchaseCredits = () => {
-      console.log('Initiating credit purchase');
+    const purchaseCredits = async () => {
+      try {
+        console.log(website)
+        const response = await apiClient.post(`api/credits/deduct/${website.value.user.id}`, {
+          amount: credit.value.amount,
+          description: credit.value.description,
+        });
+        if (response.code === 200) {
+          userHasAccess.value = true;
+        }
+      } catch (error) {
+        console.error("Failed to get access view contact:", error);
+      }
     };
 
+    watch(() => route.params.domain, (newPath, oldPath) => {
+      if (newPath !== oldPath) {
+        fetchWebsiteDetails(newPath)
+      }
+    }, { immediate: true }) 
+
+
     onMounted(() => {
-      const websiteName = route.params.domain_name;
+      const websiteName = route.params.domain;
       fetchWebsiteDetails(websiteName);
     });
 
@@ -198,19 +221,21 @@ export default {
       comment,
       reviews,
       submitReview,
-      purchaseCredits
+      credit,
+      purchaseCredits,
     };
   }
 }
 </script>
 
 <style scoped>
-
 body {
   @apply text-gray-800 leading-relaxed;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   @apply font-semibold text-gray-900 tracking-tight;
 }
 
@@ -224,7 +249,5 @@ h1, h2, h3 {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  
-}
+@media (prefers-color-scheme: dark) {}
 </style>
