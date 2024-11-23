@@ -1,35 +1,43 @@
 <template>
   <header
-    class="fixed w-full top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e0e0e0] px-10 py-3 backdrop-blur-md bg-white">
-    <RouterLink to="/" class="flex items-center gap-4 text-primary">
-      <div class="size-4">
+    class="fixed w-full top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e0e0e0] px-4 lg:px-10 py-3 backdrop-blur-md bg-white/90">
+    <!-- Logo Section -->
+    <RouterLink to="/" class="flex items-center space-x-4 text-primary">
+      <div class="size-8">
         <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="#019863"></path>
         </svg>
       </div>
-      <h2 class="hidden md:flex text-lg font-bold leading-tight tracking-[-0.015em]">Websites Rankings</h2>
+      <h2 class="hidden md:block text-lg font-bold">Websites Rankings</h2>
     </RouterLink>
 
-    <div class="flex flex-1 items-center justify-end gap-8">
-      <RouterLink to="/" class="block text-primary hover:underline font-medium">
-        Dashboard
-      </RouterLink>
-      <label class="flex flex-col min-w-40 !h-10 max-w-64">
-        <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
-          <div
-            class="text-secondary flex border-none bg-[#f0f2f4] items-center justify-center pl-4 rounded-l-xl border-r-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
-              viewBox="0 0 256 256">
-              <path
-                d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
-              </path>
-            </svg>
+    <!-- Navigation and User Actions -->
+    <div class="flex items-center space-x-4 md:space-x-8">
+      <!-- Explore Link
+      <RouterLink to="/" class="hidden md:block text-primary hover:underline font-medium">
+        Explore
+      </RouterLink> -->
+
+      <!-- Search Input -->
+      <div class="flex-grow max-w-xs mx-4">
+        <label class="block">
+          <div class="flex items-center rounded-xl bg-[#f0f2f4]">
+            <div class="pl-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+              </svg>
+            </div>
+            <input 
+              placeholder="Search"
+              class="w-full px-4 py-2 bg-[#f0f2f4] rounded-xl focus:outline-none"
+              v-model="searchQuery" 
+              @input="updateSearchQuery" 
+            />
           </div>
-          <input placeholder="Search"
-            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-primary focus:outline-0 focus:ring-0 border-none bg-[#f0f2f4] focus:border-none h-full placeholder:text-secondary px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
-            v-model="searchQuery" @input="updateSearchQuery" />
-        </div>
-      </label>
+        </label>
+      </div>
+
+      <!-- Credits Button -->
       <div class="flex gap-2">
         <button
           class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 hover-bg-primary">
@@ -44,30 +52,102 @@
           </div>
         </button>
       </div>
-      <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-        style='background-image: url("https://cdn.usegalileo.ai/stability/770ef02c-67a6-4814-b5eb-30c958e92f7f.png");'>
+
+      <!-- Profile Dropdown -->
+      <div class="hidden md:block relative" @click.stop="toggleDropdown">
+        <div 
+          class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 cursor-pointer"
+          style='background-image: url("https://cdn.usegalileo.ai/stability/770ef02c-67a6-4814-b5eb-30c958e92f7f.png");'>
+        </div>
+
+        <!-- Dropdown menu -->
+        <transition 
+          enter-active-class="transition ease-out duration-100"
+          enter-from-class="transform opacity-0 scale-95" 
+          enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75" 
+          leave-from-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95"
+        >
+          <div v-if="isDropdownOpen"
+            class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            <div class="py-1">
+              <RouterLink to="/profile"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profile
+              </RouterLink>
+
+              <RouterLink to="/buy-credits"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12" y2="16"></line>
+                </svg>
+                Buy Credits
+              </RouterLink>
+
+              <RouterLink to="/change-password"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
+                  </path>
+                </svg>
+                Change Password
+              </RouterLink>
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
   </header>
 </template>
 
-
 <script>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 export default {
   name: 'Header',
-  emits: ['update-search'], // Declare the event
+  emits: ['update-search'],
   setup(props, { emit }) {
     const searchQuery = ref('');
+    const isDropdownOpen = ref(false);
 
     const updateSearchQuery = () => {
-      emit('update-search', searchQuery.value); // Emit the updated search query
+      emit('update-search', searchQuery.value);
     };
+
+    const toggleDropdown = () => {
+      isDropdownOpen.value = !isDropdownOpen.value;
+    };
+
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.relative')) {
+        isDropdownOpen.value = false;
+      }
+    };
+
+    onMounted(() => {
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
 
     return {
       searchQuery,
       updateSearchQuery,
+      isDropdownOpen,
+      toggleDropdown,
     };
   },
 };

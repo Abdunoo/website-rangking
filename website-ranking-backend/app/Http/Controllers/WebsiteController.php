@@ -6,6 +6,8 @@ use App\Helpers\ApplicationResponse;
 use App\Models\Website;
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\isEmpty;
+
 class WebsiteController extends Controller
 {
     use ApplicationResponse;
@@ -23,6 +25,23 @@ class WebsiteController extends Controller
             200,
             'Websites retrieved successfully.',
             $websites
+        );
+    }
+
+    public function byName($name) {
+        $website = Website::with('contacts')->where('name', $name)->first();
+        if (!$website) {
+            return $this->json(
+                404,
+                'Website not found.',
+                null
+            );
+        }
+
+        return $this->json(
+            200,
+            'Website retrieved successfully.',
+            $website
         );
     }
 

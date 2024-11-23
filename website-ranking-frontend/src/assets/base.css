@@ -3,6 +3,15 @@
   
 }
 
+.bg-secondary {
+  background-color: #a80f1e;
+  
+}
+
+.bg-danger {
+  background-color: #a80f1e;
+}
+
 .text-primary {
   color: #019863; 
 }

@@ -49,8 +49,21 @@
     </div>
   </div>
   <!-- Mobile cards -->
-  <div class="md:hidden divide-y divide-gray-200 w-full">
+  <div class="md:hidden divide-y divide-gray-200 w-full space-y-2 pb-10">
     <WebsiteCard v-for="website in websites" :key="website.id" :website="website" />
+    <!-- Pagination Buttons -->
+    <div class="flex justify-between mt-4">
+        <button
+          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
+          :disabled="currentPage === 1" @click="prevPage">
+          Previous
+        </button>
+        <button
+          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
+          :disabled="currentPage === totalPages" @click="nextPage">
+          Next
+        </button>
+      </div>
   </div>
 
   <button v-show="showScrollTop" @click="scrollToTop"

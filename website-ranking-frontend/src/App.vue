@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import Header from './components/Header.vue';
+import BottomMenu from './components/BottomMenu.vue';
 
 const searchQuery = ref('');
 
@@ -15,6 +16,7 @@ const handleSearchUpdate = (query) => {
     <main class="my-16 pb-16 w-full h-full bg-white flex justify-center lg:px-40">
       <router-view :searchQuery="searchQuery" />
     </main>
+    <BottomMenu @update-search="handleSearchUpdate" />
   </section>
 </template>
 

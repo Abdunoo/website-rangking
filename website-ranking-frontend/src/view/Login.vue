@@ -33,7 +33,7 @@ export default {
 
         if (response.code === 200) {
           // Store token, user info, etc.
-          localStorage.setItem('token', response.code)
+          localStorage.setItem('token', response.data.token)
           router.push('/')
         } else {
           errorMessage.value = 'Invalid credentials'

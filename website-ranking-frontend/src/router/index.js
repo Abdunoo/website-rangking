@@ -20,6 +20,21 @@ const routes = [
     path: "/register",
     name: "Register",
     component: () => import("@/view/Register.vue")
+  },
+  {
+    path: "/change-password",
+    name: "ChangePassword",
+    component: () => import("@/view/ChangePassword.vue")
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: () => import("@/view/Profile.vue")
+  },
+  {
+    path: "/buy-credits",
+    name: "BuyCredits",
+    component: () => import("@/view/BuyCredits.vue")
   }
 
 ];

@@ -34,7 +34,8 @@ export default {
         await apiClient.post('/api/register', {
           name: name.value,
           email: email.value,
-          password: password.value
+          password: password.value,
+          password_confirmation: confirmPassword.value
         })
 
         router.push('/login')
