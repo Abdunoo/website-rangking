@@ -5,6 +5,7 @@ use App\Models\Credit;
 use App\Models\User;
 use App\Models\Website;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
@@ -31,6 +32,8 @@ class DatabaseSeeder extends Seeder
 
         $filePath = storage_path('app/top-1m.csv');
         $batchSize = 1000;
+        $maxWebsites = 300; // Maksimal jumlah website yang akan diimpor
+        $websiteCount = 0; // Penghitung jumlah website yang diimpor
 
         if (!file_exists($filePath)) {
             $this->command->error("File top-1m.csv tidak ditemukan di storage/app/");
@@ -72,11 +75,22 @@ class DatabaseSeeder extends Seeder
                 'user_id' => rand(1, 2)
             ]);
 
+            $websiteCount++; // Increment penghitung
+
             if (count($data) >= $batchSize) {
                 DB::table('websites')->insert($data);
                 $data = [];
                 $this->command->info("Memasukkan $batchSize baris...");
             }
+
+            // Hentikan jika sudah mencapai jumlah maksimum
+            if ($websiteCount >= $maxWebsites) {
+                break;
+            }
+        }
+
+        if (count($data) > 0) {
+            DB::table('websites')->insert($data); // Masukkan sisa data jika ada
         }
 
         fclose($handle);
@@ -92,12 +106,61 @@ class DatabaseSeeder extends Seeder
             'user_id' => 2, // Regular user
             'amount' => 200,
             'description' => 'Initial credits'
-        ]);
+        ]); {
+            $reviews = [
+                [
+                    'user_id' => 1, // Assuming you have users in the users table
+                    'website_id' => 1, // Assuming you have websites in the websites table
+                    'content' => 'This is a great website!',
+                    'rating' => 5,
+                    'is_approved' => true,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ],
+                [
+                    'user_id' => 2,
+                    'website_id' => 1,
+                    'content' => 'Needs some improvements',
+                    'rating' => 3,
+                    'is_approved' => false,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ],
+                // Add more reviews as needed
+            ];
 
-        // // Call other seeders
-        // $this->call([
-        //     WebsiteSeeder::class,  // Assuming WebsiteSeeder exists and is correctly implemented
-        //     CreditSeeder::class,   // Assuming CreditSeeder exists and is correctly implemented
-        // ]);
+            DB::table('reviews')->insert($reviews);
+
+
+            $settings = [
+                [
+                    'key' => 'site_name',
+                    'value' => 'My Awesome Website',
+                    'type' => 'string',
+                    'is_public' => true,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ],
+                [
+                    'key' => 'maintenance_mode',
+                    'value' => 'false',
+                    'type' => 'boolean',
+                    'is_public' => false,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ],
+                [
+                    'key' => 'max_upload_size',
+                    'value' => '10240', // 10MB in KB
+                    'type' => 'integer',
+                    'is_public' => false,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ],
+                // Add more settings as needed
+            ];
+
+            DB::table('settings')->insert($settings);
+        }
     }
 }

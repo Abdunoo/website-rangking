@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import apiClient from '@/helpers/axios';
 import router from '@/router';
 
 export default {
@@ -106,10 +107,16 @@ export default {
         role: 'User ',
         credits: 500
       },
-      showEditProfileModal: false
+      showEditProfileModal: false,
     }
   },
   methods: {
+    async fetchUserProfile() {
+      const response = await apiClient.get('api/me');
+      if (response.code === 200) {
+        this.user = response.data;
+      }
+    },
     openEditProfileModal() {
       this.showEditProfileModal = true;
     },
@@ -130,8 +137,7 @@ export default {
     }
   },
   mounted() {
-    // Fetch user data from API
-    // this.fetchUser Profile()
+    this.fetchUserProfile()
   }
 }
 </script>

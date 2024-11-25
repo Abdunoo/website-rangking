@@ -91,11 +91,11 @@
         <div class="flex items-center mb-2">
           <img :src="review.userAvatar" class="w-8 h-8 rounded-full mr-3" />
           <div>
-            <p class="font-semibold text-sm">{{ review.userName }}</p>
-            <p class="text-xs text-gray-500">{{ review.date }}</p>
+            <p class="font-semibold text-sm">{{ review.user.name }}</p>
+            <p class="text-xs text-gray-500">{{ review.updated_at }}</p>
           </div>
         </div>
-        <p class="text-sm mb-2">{{ review.comment }}</p>
+        <p class="text-sm mb-2">{{ review.content }}</p>
         <div class="flex items-center">
           <div class="flex">
             <span v-for="n in 5" :key="n" class="text-lg"
@@ -133,7 +133,7 @@
 
 <script>
 import apiClient from '@/helpers/axios';
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
 
 export default {
@@ -171,16 +171,22 @@ export default {
       }
     };
 
+    watch(() => route.params.domain, (websiteName) => {
+      if (websiteName) {
+        fetchWebsiteDetails(websiteName);
+      }
+    }, { immediate: true });
+
     const submitReview = async () => {
       try {
         const response = await apiClient.post('api/reviews', {
-          websiteId: route.params.domain,
+          website_id: website.value.id,
           rating: rating.value,
-          comment: comment.value
+          content: comment.value,
         });
         if (response.code === 200) {
-          rating.value = response.data.rating;
-          comment.value = response.data.comment;
+          reviews.value.push(response.data)
+          comment.value= '';
         }
       } catch (error) {
         console.error("Failed to submit review:", error);
@@ -189,7 +195,6 @@ export default {
 
     const purchaseCredits = async () => {
       try {
-        console.log(website)
         const response = await apiClient.post(`api/credits/deduct/${website.value.user.id}`, {
           amount: credit.value.amount,
           description: credit.value.description,
@@ -201,18 +206,6 @@ export default {
         console.error("Failed to get access view contact:", error);
       }
     };
-
-    watch(() => route.params.domain, (newPath, oldPath) => {
-      if (newPath !== oldPath) {
-        fetchWebsiteDetails(newPath)
-      }
-    }, { immediate: true }) 
-
-
-    onMounted(() => {
-      const websiteName = route.params.domain;
-      fetchWebsiteDetails(websiteName);
-    });
 
     return {
       website,

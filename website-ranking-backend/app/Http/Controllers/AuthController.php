@@ -5,12 +5,20 @@ namespace App\Http\Controllers;
 use App\Helpers\ApplicationResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     use ApplicationResponse;
+
+    public function me() {
+        return $this->json(
+            200,
+            'User retrieved successfully',
+            Auth::user());
+    }
 
     public function register(Request $request)
     {

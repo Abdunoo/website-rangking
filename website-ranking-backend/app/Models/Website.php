@@ -13,4 +13,9 @@ class Website extends Model
         return $this->hasMany(Contact::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
 }

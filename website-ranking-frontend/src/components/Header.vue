@@ -4,7 +4,7 @@
     <!-- Logo Section -->
     <RouterLink to="/" class="flex items-center space-x-4 text-primary">
       <div class="size-8">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="#019863"></path>
         </svg>
       </div>
@@ -13,51 +13,26 @@
 
     <!-- Navigation and User Actions -->
     <div class="flex items-center space-x-4 md:space-x-8">
-      <!-- Explore Link
-      <RouterLink to="/" class="hidden md:block text-primary hover:underline font-medium">
-        Explore
-      </RouterLink> -->
-
       <!-- Search Input -->
-      <!-- <div class="flex-grow max-w-xs mx-4">
-        <label class="block">
-          <div class="flex items-center rounded-xl bg-[#f0f2f4]">
-            <div class="pl-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
-                viewBox="0 0 256 256">
-                <path
-                  d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
-                </path>
-              </svg>
-            </div>
-            <input placeholder="Search" class="w-full px-4 py-2 bg-[#f0f2f4] rounded-xl focus:outline-none"
-              v-model="searchQuery" @input="updateSearchQuery" />
-          </div>
-        </label>
-      </div> -->
       <div class="flex-grow max-w-xs mx-4 relative">
         <label class="block">
           <div class="flex items-center rounded-xl bg-gray-100">
             <div class="pl-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
-                viewBox="0 0 256 256">
-                <path
-                  d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
-                </path>
-              </svg>
+              <MagnifyingGlassIcon class="w-6 h-6 text-gray-500" />
             </div>
             <input placeholder="Search" class="w-full px-4 py-2 bg-gray-100 rounded-xl focus:outline-none"
-              v-model="searchQuery" @input="updateSearchQuery" />
+              v-model="state.searchQuery" @input="debouncedSearch" />
           </div>
         </label>
-        <!-- Conditionally render search results only when not on home page -->
-        <div v-if="searchResults.length && !isHomePage"
+
+        <!-- Search Results -->
+        <transition-group name="fade" tag="div" v-if="state.searchResults.length && !isHomePage"
           class="absolute z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full shadow-lg">
-          <div v-for="result in searchResults" :key="result.id" class="p-2 hover:bg-gray-100 cursor-pointer"
+          <div v-for="result in state.searchResults" :key="result.id" class="p-2 hover:bg-gray-100 cursor-pointer"
             @click="selectResult(result)">
             {{ result.name }}
           </div>
-        </div>
+        </transition-group>
       </div>
 
       <!-- Credits Button -->
@@ -65,61 +40,27 @@
         <button
           class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 hover-bg-primary">
           <div class="text-white flex flex-col space-x-1 items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
-              viewBox="0 0 256 256">
-              <path
-                d="M207.58,63.84C186.85,53.48,159.33,48,128,48S69.15,53.48,48.42,63.84,16,88.78,16,104v48c0,15.22,11.82,29.85,32.42,40.16S96.67,208,128,208s58.85-5.48,79.58-15.84S240,167.22,240,152V104C240,88.78,228.18,74.15,207.58,63.84ZM128,64c62.64,0,96,23.23,96,40s-33.36,40-96,40-96-23.23-96-40S65.36,64,128,64Zm-8,95.86v32c-19-.62-35-3.42-48-7.49V153.05A203.43,203.43,0,0,0,120,159.86Zm16,0a203.43,203.43,0,0,0,48-6.81v31.31c-13, 4.07-29,6.87-48,7.49ZM32,152V133.53a82.88,82.88,0,0,0,16.42,10.63c2.43,1.21,5,2.35,7.58,3.43V178C40.17,170.16,32,160.29,32,152Zm168,26V147.59c2.61-1.08,5.15-2.22,7.58-3.43A82.88,82.88,0,0,0,224,133.53V152C224,160.29,215.83,170.16,200,178Z">
-              </path>
-            </svg>
-            <span class="text-xs">500</span>
+            <CreditCardIcon class="w-5 h-5" />
+            <span class="text-xs">{{ state.credit }}</span>
           </div>
         </button>
       </div>
 
       <!-- Profile Dropdown -->
-      <div class="hidden md:block relative" @click.stop="toggleDropdown">
-        <div class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 cursor-pointer"
-          style='background-image: url("https://cdn.usegalileo.ai/stability/770ef02c-67a6-4814-b5eb-30c958e92f7f.png");'>
-        </div>
+      <div class="hidden md:block relative">
+        <div class="bg-center bg-no-repeat bg-cover rounded-full w-10 h-10 cursor-pointer" @click.stop="toggleDropdown"
+          :style="{ backgroundImage: `url(${userProfileImage})` }"></div>
 
         <!-- Dropdown menu -->
-        <transition enter-active-class="transition ease-out duration-100"
-          enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100"
-          leave-to-class="transform opacity-0 scale-95">
-          <div v-if="isDropdownOpen"
+        <transition :duration="{ enter: 100, leave: 75 }" enter-active-class="transition ease-out duration-100"
+          leave-active-class="transition ease-in duration-75">
+          <div v-if="state.isDropdownOpen"
             class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
             <div class="py-1">
-              <RouterLink to="/profile"
+              <RouterLink v-for="menuItem in dropdownMenuItems" :key="menuItem.to" :to="menuItem.to"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Profile
-              </RouterLink>
-
-              <RouterLink to="/buy-credits"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                  <line x1="12" y1="16" x2="12" y2="16"></line>
-                </svg>
-                Buy Credits
-              </RouterLink>
-
-              <RouterLink to="/change-password"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
-                  </path>
-                </svg>
-                Change Password
+                <component :is="menuItem.icon" class="w-5 h-5" />
+                {{ menuItem.label }}
               </RouterLink>
             </div>
           </div>
@@ -129,74 +70,141 @@
   </header>
 </template>
 
-<script>
-import apiClient from '@/helpers/axios';
-import router from '@/router';
+<script setup>
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash-es';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { 
+MagnifyingGlassIcon,
+CreditCardIcon,
+UserIcon,
+KeyIcon 
+} from '@heroicons/vue/24/solid';
 
-export default {
-  name: 'Header',
-  emits: ['update-search'],
-  setup(props, { emit }) {
-    const route = useRoute();
-    const searchQuery = ref('');
-    const searchResults = ref([]);
-    const isDropdownOpen = ref(false);
 
-    // Computed property to check if current route is home page
-    const isHomePage = computed(() => route.path === '/');
+// Helpers
+import apiClient from '@/helpers/axios';
 
-    const updateSearchQuery = debounce(async () => {
-      emit('update-search', searchQuery.value);
+// Props and Emits
+const props = defineProps({
+  initialCredits: {
+    type: Number,
+    default: 0
+  }
+});
 
-      if (searchQuery.value.length > 0 && !isHomePage.value) {
-        try {
-          const response = await apiClient.get(`/api/websites?search=${searchQuery.value}&limit=5`);
-          searchResults.value = response.data.data; // Adjust based on the API response structure
-        } catch (error) {
-          console.error("Search error:", error);
-          searchResults.value = [];
-        }
-      } else {
-        searchResults.value = [];
-      }
-    }, 500);
+const emit = defineEmits(['update-search']);
 
-    const selectResult = (result) => {
-      searchResults.value = [];
-      // router.removeRoute(route.name)
-      router.push(`/${result.name}`);
-    };
+// State Management
+const state = reactive({
+  searchQuery: '',
+  searchResults: [],
+  isDropdownOpen: false,
+  credit: props.initialCredits
+});
 
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
+// Router and Route
+const route = useRoute();
+const router = useRouter();
 
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.relative')) {
-        isDropdownOpen.value = false;
-      }
-    };
+// Computed Properties
+const isHomePage = computed(() => route.path === '/', {
+  lazy: true
+});
 
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside);
-    });
+const userProfileImage = computed(() =>
+  'https://cdn.usegalileo.ai/stability/770ef02c-67a6-4814-b5eb-30c958e92f7f.png'
+);
 
-    onUnmounted(() => {
-      document.removeEventListener('click', handleClickOutside);
-    });
-
-    return {
-      searchQuery,
-      searchResults,
-      updateSearchQuery,
-      isDropdownOpen,
-      toggleDropdown,
-      selectResult,
-      isHomePage,
-    };
+// Dropdown Menu Items
+const dropdownMenuItems = [
+  {
+    to: '/profile',
+    label: 'Profile',
+    icon: UserIcon
   },
+  {
+    to: '/buy-credits',
+    label: 'Buy Credits',
+    icon: CreditCardIcon
+  },
+  {
+    to: '/change-password',
+    label: 'Change Password',
+    icon: KeyIcon
+  }
+];
+
+// Search Functionality
+const debouncedSearch = debounce(async () => {
+  // Early return for short queries or home page
+  if (state.searchQuery.length < 2 || isHomePage.value) {
+    state.searchResults = [];
+    return;
+  }
+
+  try {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const response = await apiClient.get('/api/websites', {
+      params: {
+        search: state.searchQuery,
+        limit: 5
+      },
+      signal
+    });
+
+    state.searchResults = response.data.data;
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error(error)
+      state.searchResults = [];
+    }
+  }
+}, 300);
+
+// Result Selection
+const selectResult = (result) => {
+  state.searchResults = [];
+  router.push(`/${result.name}`);
 };
+
+// Dropdown Toggle
+const toggleDropdown = () => {
+  state.isDropdownOpen = !state.isDropdownOpen;
+};
+
+// Outside Click Handler
+const handleClickOutside = (event) => {
+  const dropdownElement = document.querySelector('.relative');
+  if (dropdownElement && !dropdownElement.contains(event.target)) {
+    state.isDropdownOpen = false;
+  }
+};
+
+// Update Credits
+const updateCredits = () => {
+  const user = JSON.parse(localStorage.getItem('_usr'));
+  state.credit = user ? user.credits : 0;
+};
+
+// Watch for Credit Changes
+watch(() => props.initialCredits, (newCredits) => {
+  state.credit = newCredits;
+});
+
+// Lifecycle Hooks
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+  updateCredits();
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
+
+<style scoped>
+/* Add any necessary styles here */
+</style>

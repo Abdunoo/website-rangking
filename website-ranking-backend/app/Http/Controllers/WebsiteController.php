@@ -18,9 +18,10 @@ class WebsiteController extends Controller
      */
     public function index(Request $request)
     {
+        $limit = $request->input('limit', 50);
         $websites = Website::where('domain', 'LIKE', '%' . $request->input('search', '') . '%')
             ->orderBy('rank', 'asc')
-            ->paginate(50);
+            ->paginate($limit);
 
         return $this->json(
             200,
@@ -31,7 +32,10 @@ class WebsiteController extends Controller
 
     public function byName($name) {
         $user = Auth::user();
-        $website = Website::with('contacts')->where('name', $name)->first();
+        $website = Website::with(['contacts', 'reviews' => function($query) {
+            $query->with('user'); // Eager load the user for each review
+        }])->where('name', $name)->first();
+
         if (!$website) {
             return $this->json(
                 404,

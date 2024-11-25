@@ -2,14 +2,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
-import axios from 'axios' // Assuming you're using axios for API calls
 import apiClient from '@/helpers/axios';
 
 export default {
   components: {
     Button
   },
-  setup() {
+  emits: ['update-credits'],
+  setup(props, { emit }) {
     const email = ref('')
     const password = ref('')
     const errorMessage = ref('')
@@ -29,11 +29,12 @@ export default {
           password: password.value
         })
 
-        console.log(response)
-
         if (response.code === 200) {
           // Store token, user info, etc.
           localStorage.setItem('token', response.data.token)
+          localStorage.setItem('_usr', JSON.stringify(response.data.user))
+          emit('update-credits', response.data.user.credits);
+          console.log('update-credits', response.data.user.credits);
           router.push('/')
         } else {
           errorMessage.value = 'Invalid credentials'
