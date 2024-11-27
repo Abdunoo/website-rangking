@@ -32,17 +32,17 @@ class DatabaseSeeder extends Seeder
 
         $filePath = storage_path('app/top-1m.csv');
         $batchSize = 1000;
-        $maxWebsites = 300; // Maksimal jumlah website yang akan diimpor
-        $websiteCount = 0; // Penghitung jumlah website yang diimpor
+        $maxWebsites = 300;
+        $websiteCount = 0;
 
         if (!file_exists($filePath)) {
-            $this->command->error("File top-1m.csv tidak ditemukan di storage/app/");
+            $this->command->error("File top-1m.csv not found in storage/app/");
             return;
         }
 
         $handle = fopen($filePath, 'r');
         if ($handle === false) {
-            $this->command->error("Gagal membuka file.");
+            $this->command->error("Failed to open the file.");
             return;
         }
 
@@ -51,21 +51,26 @@ class DatabaseSeeder extends Seeder
             $rank = $line[0];
             $domain = $line[1];
 
+
+            $previousRank = $rank + rand(-1, 1);
+            if ($rank <= 3) {
+                $previousRank = $rank + rand(0, 3);
+            }
+
             $website = Website::create([
                 'rank' => $rank,
-                'previous_rank' => $rank,
+                'previous_rank' => $previousRank,
                 'domain' => $domain,
                 'name' => ucfirst(explode('.', $domain)[0]),
-                'rating' => rand(0, 50) / 10, // Generate a random rating between 0.0 and 5.0
+                'rating' => rand(0, 50) / 10,
                 'category' => 'Uncategorized',
             ]);
 
-            // Tambahkan dua kontak untuk setiap website
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'email',
                 'value' => 'contact' . $rank . '@' . $domain,
-                'user_id' => rand(1, 2) // Asumsi user_id 1 dan 2 ada
+                'user_id' => rand(1, 2)
             ]);
 
             Contact::create([
@@ -75,15 +80,14 @@ class DatabaseSeeder extends Seeder
                 'user_id' => rand(1, 2)
             ]);
 
-            $websiteCount++; // Increment penghitung
+            $websiteCount++;
 
             if (count($data) >= $batchSize) {
                 DB::table('websites')->insert($data);
                 $data = [];
-                $this->command->info("Memasukkan $batchSize baris...");
+                $this->command->info("Inserted $batchSize rows...");
             }
 
-            // Hentikan jika sudah mencapai jumlah maksimum
             if ($websiteCount >= $maxWebsites) {
                 break;
             }
@@ -108,61 +112,79 @@ class DatabaseSeeder extends Seeder
             'website_id' => 2, // Regular user
             'amount' => 100,
             'description' => 'Initial credits'
-        ]); {
-            $reviews = [
-                [
-                    'user_id' => 1, // Assuming you have users in the users table
-                    'website_id' => 1, // Assuming you have websites in the websites table
-                    'content' => 'This is a great website!',
-                    'rating' => 5,
-                    'is_approved' => true,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ],
-                [
-                    'user_id' => 2,
-                    'website_id' => 1,
-                    'content' => 'Needs some improvements',
-                    'rating' => 3,
-                    'is_approved' => false,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ],
-                // Add more reviews as needed
-            ];
+        ]);
 
+        $websites = Website::all();
+
+        foreach ($websites as $website) {
+            // Randomly decide to add 1 or 2 reviews for each website
+            $reviewsCount = rand(1, 2); // Randomly choose 1 or 2 reviews
+
+            // Create reviews for the current website
+            $reviews = [];
+            for ($i = 0; $i < $reviewsCount; $i++) {
+                // Randomly pick a user_id, assuming you have users in the users table
+                $user_id = User::inRandomOrder()->first()->id;
+
+                $reviews[] = [
+                    'user_id' => $user_id,
+                    'website_id' => $website->id, // Associate with the current website
+                    'content' => $this->generateReviewContent(),
+                    'rating' => rand(1, 5), // Random rating between 1 and 5
+                    'is_approved' => (bool)rand(0, 1), // Randomly set approval status
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
+            }
+
+            // Insert the reviews into the database
             DB::table('reviews')->insert($reviews);
+        };
 
+        $settings = [
+            [
+                'key' => 'site_name',
+                'value' => 'My Awesome Website',
+                'type' => 'string',
+                'is_public' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'key' => 'maintenance_mode',
+                'value' => 'false',
+                'type' => 'boolean',
+                'is_public' => false,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'key' => 'max_upload_size',
+                'value' => '10240', // 10MB in KB
+                'type' => 'integer',
+                'is_public' => false,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            // Add more settings as needed
+        ];
 
-            $settings = [
-                [
-                    'key' => 'site_name',
-                    'value' => 'My Awesome Website',
-                    'type' => 'string',
-                    'is_public' => true,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ],
-                [
-                    'key' => 'maintenance_mode',
-                    'value' => 'false',
-                    'type' => 'boolean',
-                    'is_public' => false,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ],
-                [
-                    'key' => 'max_upload_size',
-                    'value' => '10240', // 10MB in KB
-                    'type' => 'integer',
-                    'is_public' => false,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ],
-                // Add more settings as needed
-            ];
+        DB::table('settings')->insert($settings);
+    }
 
-            DB::table('settings')->insert($settings);
-        }
+    private function generateReviewContent()
+    {
+        $contents = [
+            'This is a great website!',
+            'Needs some improvements.',
+            'Excellent user experience.',
+            'Not bad, but could be better.',
+            'I love the design!',
+            'Very slow and buggy.',
+            'Couldn\'t find what I was looking for.',
+            'The customer support is great!'
+        ];
+
+        return $contents[array_rand($contents)];
     }
 }

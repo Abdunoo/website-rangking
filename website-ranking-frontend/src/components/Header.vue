@@ -3,10 +3,8 @@
     class="fixed w-full top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-gray-300 px-4 lg:px-10 py-3 backdrop-blur-md bg-white/90">
     <!-- Logo Section -->
     <RouterLink to="/" class="flex items-center space-x-4 text-primary">
-      <div class="size-8">
-        <svg aria-hidden="true" focusable="false" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="#019863"></path>
-        </svg>
+      <div class="size-10">
+        <img :src="logo" alt="">
       </div>
       <h2 class="hidden md:block text-lg font-bold">Websites Rankings</h2>
     </RouterLink>
@@ -78,6 +76,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/store/dataStore.js';
 import { debounce } from 'lodash-es';
+import logo from '@/assets/images/logo.png';
 
 export default {
   components: {
@@ -152,6 +151,7 @@ export default {
       debouncedSearch,
       toggleDropdown,
       selectResult,
+      logo,
     };
   }
 };

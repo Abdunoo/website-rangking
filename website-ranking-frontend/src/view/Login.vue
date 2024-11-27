@@ -80,7 +80,7 @@ export default {
 
         if (response.code === 200) {
           dataStore.updateCredits(response.data.user.credits);
-          dataStore.updatePhotoProfile(response.data.user.photo);
+          if (response.data.user.photo) dataStore.updatePhotoProfile(response.data.user.photo);
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('_usr', JSON.stringify(response.data.user));
           router.push('/')

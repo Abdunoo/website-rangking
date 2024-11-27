@@ -5,7 +5,13 @@ import apiClient from '@/helpers/axios';
 
 export const useDataStore = defineStore('data', {
   state: () => ({
-    user: null, 
+    user: {
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      role: 'user.  ',
+      credits: 500,
+      photo: ''
+    }, 
     profilePhoto: defaultPicture,
     credits: 0, 
     searchQuery: '', 
@@ -15,7 +21,7 @@ export const useDataStore = defineStore('data', {
       try {
         const response = await apiClient.get('api/auth/me');
         this.user = response.data;
-        this.profilePhoto = this.user.photo || '';
+        this.profilePhoto = this.user.photo ?? defaultPicture;
         this.credits = this.user.credits || 0;
       } catch (error) {
         console.error('Error fetching user data:', error);

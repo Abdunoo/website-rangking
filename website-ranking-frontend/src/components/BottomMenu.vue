@@ -40,9 +40,6 @@
 <script>
 export default {
     name: 'BottomMenu',
-    setup(props, { emit }) {
-        return {
-        }
-    }
+    setup() {}
 }
 </script>

@@ -69,7 +69,7 @@ class CreditController extends Controller
         $credit = Credit::create([
             'user_id' => $user->id,
             'website_id' => $request->website_id,
-            'amount' => -$request->amount,
+            'amount' => $request->amount,
             'description' => $request->description,
         ]);
 

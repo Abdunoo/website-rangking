@@ -131,12 +131,13 @@
 
 <script>
 import apiClient from '@/helpers/axios';
+import { useDataStore } from '@/store/dataStore.js';
 import { reactive, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default {
   name: 'Domain',
-  setup({ emit }) {
+  setup() {
     const state = reactive({
       website: {
         name: '',
@@ -157,6 +158,7 @@ export default {
       reviews: []
     });
 
+    const dataStore = useDataStore();
     const route = useRoute();
 
     const fetchWebsiteDetails = async (websiteName) => {
@@ -201,7 +203,7 @@ export default {
         });
         if (response.code === 200) {
           state.userHasAccess = true;
-          emit('update-credits', response.data.amount);
+          dataStore.decreaseCredit(response.data.amount);
         }
       } catch (error) {
         console.error("Failed to get access view contact:", error);
