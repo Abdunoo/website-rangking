@@ -12,7 +12,7 @@ class CreateReviewsAndSettingsTables extends Migration
             $table->id()->primary();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('website_id');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->integer('rating')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamps();

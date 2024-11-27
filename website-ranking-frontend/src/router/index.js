@@ -35,6 +35,11 @@ const routes = [
     path: "/buy-credits",
     name: "BuyCredits",
     component: () => import("@/view/BuyCredits.vue")
+  },
+  {
+    path: "/payment-history",
+    name: "PaymentHistory",
+    component: () => import("@/view/PaymentHistory.vue")
   }
 
 ];

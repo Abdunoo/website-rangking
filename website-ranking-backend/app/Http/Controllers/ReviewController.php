@@ -6,13 +6,16 @@ use App\Helpers\ApplicationResponse;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\Website;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
     /**
      * Display reviews for a specific website
      */
@@ -23,6 +26,8 @@ class ReviewController extends Controller
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+        $reviews->user->photo = $reviews->user->photo ? Storage::url($reviews->user->photo) : null;
 
         $data = [
             'reviews' => $reviews,
@@ -43,7 +48,6 @@ class ReviewController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'website_id' => 'required|exists:websites,id',
-            'content' => 'required|string|min:10|max:500',
             'rating' => 'nullable|integer|min:1|max:5'
         ]);
 
@@ -63,6 +67,7 @@ class ReviewController extends Controller
                 'is_approved' => false // Requires admin approval
             ]);
             $review->user = User::find($review->user_id);
+            $review->user->photo = $review->user->photo ? Storage::url($review->user->photo) : null;
 
             return $this->json(
                 200,
@@ -77,6 +82,42 @@ class ReviewController extends Controller
         }
     }
 
+    public function approveReview($reviewId)
+    {
+        $review = Review::find($reviewId);
+
+        if (!$review) {
+            return $this->json(404, 'Review not found.');
+        }
+
+        if ($review->is_approved) {
+            return $this->json(400, 'Review is already approved.');
+        }
+
+        $review->is_approved = true;
+        $review->save();
+
+        $website = Website::find($review->website_id);
+        if (!$website) {
+            return $this->json(404, 'Website not found.');
+        }
+
+        $approvedReviews = Review::where('website_id', $website->id)
+            ->where('is_approved', true)
+            ->get();
+
+        $averageRating = $approvedReviews->avg('rating');
+        $website->rating = round($averageRating, 2);
+        $website->save();
+
+        return $this->json(
+            200,
+            'Review approved and website rating updated successfully.',
+            $review
+        );
+    }
+
+
     /**
      * Update an existing review
      */
@@ -84,7 +125,6 @@ class ReviewController extends Controller
     {
         $review = Review::findOrFail($reviewId);
 
-        // Ensure user can only edit their own reviews
         $this->authorize('update', $review);
 
         $validator = Validator::make($request->all(), [
@@ -144,24 +184,6 @@ class ReviewController extends Controller
             200,
             'Reviews retrieved successfully',
             $reviews,
-        );
-    }
-
-    /**
-     * Admin method to approve reviews
-     */
-    public function approveReview($reviewId)
-    {
-        // Ensure only admins can approve reviews
-        $this->authorize('admin', Review::class);
-
-        $review = Review::findOrFail($reviewId);
-        $review->update(['is_approved' => true]);
-
-        return $this->json(
-            200,
-            'Review approved successfully',
-            $review
         );
     }
 

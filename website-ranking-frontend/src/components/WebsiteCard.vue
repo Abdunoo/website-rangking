@@ -6,7 +6,7 @@
         <span 
           :class="[
             'text-sm',
-            website.previous_rank > website.rank ? 'text-green-600' : 'text-gray-500'
+            website.previous_rank >= website.rank ? 'text-primary' : 'text-danger'
           ]"
         >
           {{ getRankChange(website.rank, website.previous_rank) }}
@@ -43,9 +43,8 @@ export default {
   methods: {
     getRankChange(current, previous) {
       const diff = previous - current;
-      if (diff > 0) return `↑${diff}`;
-      if (diff < 0) return `↓${Math.abs(diff)}`;
-      return '-';
+      if (diff >= 0) return `↑${diff}`
+      return `↓${diff}`;
     }
   }
 }

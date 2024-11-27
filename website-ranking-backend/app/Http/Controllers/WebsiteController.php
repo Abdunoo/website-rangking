@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
 use App\Models\Website;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 use function PHPUnit\Framework\isEmpty;
 
 class WebsiteController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
 
     /**
      * Display a listing of websites.
@@ -32,9 +35,16 @@ class WebsiteController extends Controller
 
     public function byName($name) {
         $user = Auth::user();
-        $website = Website::with(['contacts', 'reviews' => function($query) {
-            $query->with('user'); // Eager load the user for each review
-        }])->where('name', $name)->first();
+
+        $website = Website::with([
+            'contacts',
+            'reviews' => function ($query) {
+                $query->where('is_approved', true);  // Apply condition to reviews
+            },
+            'reviews.user'
+        ])
+        ->where('name', $name)
+        ->first();
 
         if (!$website) {
             return $this->json(
@@ -45,11 +55,16 @@ class WebsiteController extends Controller
         }
 
         $website->view_contact = $website->credits()
-        ->where('user_id', $user->id)
-        ->where('credits.website_id', $website->id)
-        ->exists();
+            ->where('user_id', $user->id)
+            ->where('credits.website_id', $website->id)
+            ->exists();
 
-        $website->user = $user;
+        foreach ($website->reviews as $review) {
+            $photoPath = $review->user->photo;
+            $review->user->photo = $photoPath && !str_starts_with($photoPath, 'http')
+                ? Storage::url($photoPath)
+                : $photoPath;
+        }
 
         return $this->json(
             200,

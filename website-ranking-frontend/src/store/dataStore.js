@@ -8,13 +8,14 @@ export const useDataStore = defineStore('data', {
     user: {
       name: 'John Doe',
       email: 'john.doe@example.com',
-      role: 'user.  ',
+      role: 'user',
       credits: 500,
       photo: ''
     }, 
     profilePhoto: defaultPicture,
     credits: 0, 
     searchQuery: '', 
+    defaultPicture,
   }),
   actions: {
     async fetchUserData() {

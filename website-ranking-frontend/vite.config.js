@@ -38,17 +38,17 @@ export default defineConfig({
         id: "/rank/",
         icons: [
           {
-            src: "/rank/assets/image/logo_192x192.webp",
+            src: "/rank/assets/images/logo_192x192.webp",
             sizes: "192x192",
             type: "image/webp",
           },
           {
-            src: "/rank/assets/image/logo_512x512.webp",
+            src: "/rank/assets/images/logo_512x512.webp",
             sizes: "512x512",
             type: "image/webp",
           },
           {
-            src: "/rank/assets/image/logo_512x512_maskable.webp",
+            src: "/rank/assets/images/logo_512x512_maskable.webp",
             sizes: "512x512",
             type: "image/webp",
             purpose: "any maskable",

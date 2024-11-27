@@ -19,9 +19,13 @@
               @click="toDetail(website.name)">
               <td class="h-[72px] px-4 py-2 text-[#111418] text-sm font-normal leading-normal">{{ website.rank }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <span :class="website.previous_rank > website.rank ? 'text-secondary' : 'text-red-500'">
-                  {{ website.previous_rank > website.rank ? '↑' : '↓' }}
-                  {{ website.previous_rank - website.rank }}
+                <span 
+                  :class="[
+                    'text-sm',
+                    website.previous_rank >= website.rank ? 'text-primary' : 'text-danger'
+                  ]"
+                >
+                  {{ getRankChange(website.rank, website.previous_rank) }}
                 </span>
               </td>
               <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.domain }}</td>
@@ -131,6 +135,12 @@ export default {
       }
     };
 
+    const getRankChange = (current, previous)=> {
+      const diff = previous - current;
+      if (diff >= 0) return `↑${diff}`
+      return `↓${diff}`;
+    }
+
     const toDetail = (name) => {
       router.push(`/${name}`);
     };
@@ -177,6 +187,7 @@ export default {
       toDetail,
       showScrollTop,
       scrollToTop,
+      getRankChange,
     };
   },
 };

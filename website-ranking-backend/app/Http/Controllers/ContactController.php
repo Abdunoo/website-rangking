@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Helpers\ApplicationResponse;
 use App\Models\Contact;
 use App\Models\Website;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
 
     public function index(Website $website)
 {

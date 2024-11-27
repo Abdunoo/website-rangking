@@ -16,11 +16,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me'])->name('me');
     Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
     Route::delete('/auth/profile/photo', [AuthController::class, 'removeProfilePhoto']);
-
-
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->name('change.password');
     Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
     Route::get('/credits', [CreditController::class, 'index']);
-    Route::post('/credits/add/{user}', [CreditController::class, 'addCredits']);
+    Route::post('/credits/purchase-credits', [CreditController::class, 'addCredits']);
+    Route::get('/credits/purchase-history', [CreditController::class, 'getHistoryPayment']);
     Route::post('/credits/deduct', [CreditController::class, 'deductCredits']);
     Route::put('/websites/{website}', [WebsiteController::class, 'update']);
     Route::delete('/websites/{website}', [WebsiteController::class, 'destroy']);

@@ -13,11 +13,17 @@ return new class extends Migration
     {
         Schema::create('credits', function (Blueprint $table) {
             $table->id()->primary();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('website_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('website_id')->nullable();
+            $table->unsignedBigInteger('user_id');
             $table->integer('amount');
             $table->string('description')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('type', ['purchase', 'refund', 'deduction']);
+            $table->string('payment_method')->nullable()->default(null);
             $table->timestamps();
+
+            $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

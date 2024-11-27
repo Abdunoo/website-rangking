@@ -76,7 +76,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/store/dataStore.js';
 import { debounce } from 'lodash-es';
-import logo from '@/assets/images/logo.png';
+import logo from '@/assets/images/logo.webp';
 
 export default {
   components: {

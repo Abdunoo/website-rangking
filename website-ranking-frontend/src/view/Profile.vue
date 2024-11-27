@@ -1,8 +1,13 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-      <div class="bg-primary text-white p-6">
-        <h2 class="text-2xl font-bold">User Profile</h2>
+      <div class="bg-primary flex items-center justify-between text-white p-6">
+        <h2 class="text-2xl font-bold">User Profile
+        </h2>
+        <RouterLink to="/payment-history"
+            class="bg-white text-primary text-sm px-4 py-2 rounded hover:bg-opacity-80 transition-colors">
+            Payment History
+          </RouterLink>
       </div>
 
       <div class="p-6">
@@ -37,14 +42,14 @@
           </div>
         </div>
 
-        <div class="mt-6 flex space-x-4">
+        <div class="mt-6 flex space-x-4 text-sm">
           <button @click="openEditProfileModal"
             class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-80 transition-colors">
             Edit Profile
           </button>
 
           <button @click="redirectToChangePassword"
-            class="bg-secondary text-white px-4 py-2 rounded hover:bg-opacity-80 transition-colors">
+            class="bg-danger text-white px-4 py-2 rounded hover:bg-opacity-80 transition-colors">
             Change Password
           </button>
 
@@ -75,7 +80,7 @@
           <button @click="saveProfile" class="bg-primary text-white px-4 py-2 rounded">
             Save Changes
           </button>
-          <button @click="closeEditProfileModal" class="bg-secondary text-white px-4 py-2 rounded">
+          <button @click="closeEditProfileModal" class="bg-danger text-white px-4 py-2 rounded">
             Cancel
           </button>
         </div>
@@ -89,12 +94,14 @@ import { ref, onMounted } from 'vue';
 import apiClient from '@/helpers/axios';
 import router from '@/router';
 import { useDataStore } from '@/store/dataStore.js';
+import { useToast } from 'vue-toastification';
 
 export default {
   setup() {
     const showEditProfileModal = ref(false);
     const selectedFile = ref(null);
     const dataStore = useDataStore();
+    const toast = useToast();
 
     const openEditProfileModal = () => {
       showEditProfileModal.value = true;
@@ -119,10 +126,12 @@ export default {
           }
         });
         if (response.code === 200) {
+          toast.success('Profile updated successfully');
           closeEditProfileModal();
           await dataStore.fetchUserData()
         }
       } catch (error) {
+        toast.error('Profile updated failed');
         console.error(error);
       }
     };
@@ -146,6 +155,7 @@ export default {
       localStorage.removeItem('_usr');
       dataStore.removeCredits();
       dataStore.removePhotoProfile();
+      toast.info('Logout Successfully!')
     };
 
     return {

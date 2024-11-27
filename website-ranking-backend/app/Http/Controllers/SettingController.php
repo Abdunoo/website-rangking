@@ -6,10 +6,12 @@ use App\Helpers\ApplicationResponse;
 use App\Http\Requests\StoreSettingRequest;
 use App\Http\Requests\UpdateSettingRequest;
 use App\Models\Setting;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class SettingController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
 
     /**
      * Display a listing of the resource.

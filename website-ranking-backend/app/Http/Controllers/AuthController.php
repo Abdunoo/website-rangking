@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
 
     public function me() {
         $user = Auth::user();
@@ -171,5 +173,27 @@ class AuthController extends Controller
          200,
          'No profile photo to remove'
         );
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validatedData = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($validatedData['current_password'], Auth::user()->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The provided password does not match our records.'],
+            ]);
+        }
+
+        Auth::user()->update([
+            'password' => Hash::make($validatedData['password']), // Hash the new password before saving
+        ]);
+
+        return response()->json([
+            'message' => 'Password changed successfully.',
+        ]);
     }
 }

@@ -65,32 +65,28 @@
 
     <section class="mb-6">
       <h2 class="text-lg font-bold text-gray-800 mb-4">Report Contact Changes</h2>
-      <form class="space-y-3">
-        <input
+      <form class="space-y-3" @submit.prevent="submitContactChanges">
+        <input v-model="newEmail"
           class="w-full p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 rounded-lg border"
           placeholder="Enter new email" />
-        <input
+        <input v-model="newPhoneNumber" type="number"
           class="w-full p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 rounded-lg border"
           placeholder="Enter new phone number" />
-        <textarea
-          class="w-full p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 rounded-lg border"
-          placeholder="Additional information"></textarea>
-        <button class="w-full bg-primary text-white rounded-lg py-2 hover:bg-primary">
+        <button type="submit" class="w-full bg-primary text-white rounded-lg py-2 hover:bg-primary">
           Submit Report
         </button>
       </form>
     </section>
 
     <!-- User Reviews Section -->
-    <section>
+    <section class="mb-44">
       <h3 class="text-lg font-bold mb-4">User Reviews</h3>
-
       <div v-for="review in reviews" :key="review.id" class="mb-4 p-3 bg-gray-50 rounded-lg">
         <div class="flex items-center mb-2">
-          <img :src="review.userAvatar" class="w-8 h-8 rounded-full mr-3" />
+          <img :src="review.user.photo ?? dataStore.defaultPicture" class="w-8 h-8 rounded-full object-cover mr-3" />
           <div>
             <p class="font-semibold text-sm">{{ review.user.name }}</p>
-            <p class="text-xs text-gray-500">{{ review.updated_at }}</p>
+            <p class="text-xs text-gray-500">{{ formatDate(review.updated_at) }}</p>
           </div>
         </div>
         <p class="text-sm mb-2">{{ review.content }}</p>
@@ -106,25 +102,33 @@
     </section>
 
     <!-- Add Review Section -->
-    <section class="mt-6">
-      <h2 class="text-lg font-bold mb-4">Add Your Review</h2>
-      <form @submit.prevent="submitReview" class="space-y-3">
-        <div class="flex justify-center mb-4">
-          <div class="flex space-x-2">
-            <button v-for="i in 5" :key="i" type="button" @click="rating = i" class="text-2xl transition-colors"
-              :class="rating >= i ? 'text-yellow-500' : 'text-gray-300'">
-              ★
+    <section
+      class="fixed bottom-10 md:bottom-0 left-0 right-0 flex justify-center items-center border border-gray-100 bg-white p-4 shadow-lg rounded-t-lg max-h-[250px] overflow-auto">
+      <div class="w-full max-w-2xl">
+        <h2 class="text-lg font-bold mb-2 text-center">Add Your Review</h2>
+        <form @submit.prevent="submitReview" class="w-full">
+          <div class="flex justify-center mb-2">
+            <div class="flex space-x-1">
+              <button v-for="i in 5" :key="i" type="button" @click="rating = i" class="text-3xl transition-colors"
+                :class="rating >= i ? 'text-yellow-500' : 'text-gray-300'">
+                ★
+              </button>
+            </div>
+          </div>
+
+          <!-- Input and Button in Flex Container -->
+          <div class="flex items-center space-x-2">
+            <textarea v-model="comment"
+              class="flex-grow p-2 text-sm border rounded-lg min-h-[60px] max-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Share your experience..."></textarea>
+
+            <button type="submit"
+              class="bg-primary text-white rounded-lg py-2 px-4 hover:hover-bg-primary transition duration-200 ease-in-out">
+              Submit
             </button>
           </div>
-        </div>
-
-        <textarea v-model="comment" class="w-full p-2 text-sm border rounded-lg min-h-[100px]"
-          placeholder="Share your experience..."></textarea>
-
-        <button type="submit" class="w-full bg-primary text-white rounded-lg py-2 hover:bg-primary">
-          Submit Review
-        </button>
-      </form>
+        </form>
+      </div>
     </section>
   </div>
 </template>
@@ -134,6 +138,7 @@ import apiClient from '@/helpers/axios';
 import { useDataStore } from '@/store/dataStore.js';
 import { reactive, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'Domain',
@@ -155,11 +160,14 @@ export default {
       userHasAccess: false,
       rating: 4,
       comment: '',
-      reviews: []
+      reviews: [],
+      newEmail: '',
+      newPhoneNumber: '',
     });
 
     const dataStore = useDataStore();
     const route = useRoute();
+    const toast = useToast();
 
     const fetchWebsiteDetails = async (websiteName) => {
       try {
@@ -172,12 +180,6 @@ export default {
       }
     };
 
-    watch(() => route.params.domain, (websiteName) => {
-      if (websiteName) {
-        fetchWebsiteDetails(websiteName);
-      }
-    }, { immediate: true });
-
     const submitReview = async () => {
       try {
         const response = await apiClient.post('api/reviews', {
@@ -186,10 +188,12 @@ export default {
           content: state.comment,
         });
         if (response.code === 200) {
+          toast.success('Review submitted successfully!');
           state.reviews.push(response.data);
           state.comment = '';
         }
       } catch (error) {
+        toast.error('Failed to submit review');
         console.error("Failed to submit review:", error);
       }
     };
@@ -202,18 +206,62 @@ export default {
           description: state.credit.description,
         });
         if (response.code === 200) {
+          toast.success('Get access view contact successfully!');
           state.userHasAccess = true;
           dataStore.decreaseCredit(response.data.amount);
         }
       } catch (error) {
+        toast.error('Failed to get access view contact')
         console.error("Failed to get access view contact:", error);
       }
     };
+
+    const submitContactChanges = ()=> {
+      if (state.newEmail.length < 2 && state.newPhoneNumber.length < 2) return;
+      console.log('New Email:', state.newEmail);
+      console.log('New Phone Number:', state.newPhoneNumber);
+      
+      state.newEmail = '';
+      state.newPhoneNumber = '';
+      
+      toast.info('Contact changes not implemented yet!');
+    }
+
+    const formatDate = (datetime) => {
+      const date = new Date(datetime);
+
+      // Convert to US format: MM/DD/YYYY, HH:mm:ss AM/PM
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true, // Enables AM/PM format
+      };
+
+      return date.toLocaleString("en-US", options);
+    }
+
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    watch(() => route.params.domain, (websiteName) => {
+      if (websiteName) {
+        fetchWebsiteDetails(websiteName);
+        scrollToTop();
+      }
+    }, { immediate: true });
 
     return {
       ...toRefs(state),
       submitReview,
       purchaseCredits,
+      dataStore,
+      formatDate,
+      submitContactChanges,
     };
   }
 }

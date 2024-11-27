@@ -13,15 +13,14 @@ return new class extends Migration
     {
         Schema::create('contacts', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('website_id'); // Foreign key ke tabel websites
-            $table->string('type'); // Jenis kontak (email, Skype, Telegram, dll.)
-            $table->string('value'); // Nilai kontak (contoh: alamat email atau username Telegram)
-            $table->unsignedBigInteger('user_id')->nullable(); // ID pengguna yang menambahkan
+            $table->unsignedBigInteger('website_id');
+            $table->string('type');
+            $table->string('value');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
-            // Relasi
             $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

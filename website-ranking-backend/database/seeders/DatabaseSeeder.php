@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\DataHelper;
 use App\Models\Contact;
 use App\Models\Credit;
 use App\Models\User;
@@ -104,14 +105,18 @@ class DatabaseSeeder extends Seeder
             'user_id' => 2, // Admin
             'website_id' => 1, // Admin
             'amount' => 100,
-            'description' => 'Initial credits'
+            'description' => 'Initial credits',
+            'type' => DataHelper::PURCHASE,
+            'status'=> DataHelper::APPROVED
         ]);
 
         Credit::create([
             'user_id' => 2, // Regular user
             'website_id' => 2, // Regular user
             'amount' => 100,
-            'description' => 'Initial credits'
+            'description' => 'Initial credits',
+            'type' => DataHelper::PURCHASE,
+            'status'=> DataHelper::APPROVED
         ]);
 
         $websites = Website::all();

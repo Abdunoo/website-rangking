@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
+use App\Helpers\DataHelper;
 use App\Models\Credit;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CreditController extends Controller
 {
     use ApplicationResponse;
+    use AuthorizesRequests;
 
     public function index(Request $request)
     {
@@ -24,27 +27,65 @@ class CreditController extends Controller
         );
     }
 
-    public function addCredits(Request $request, User $user)
+    public function getHistoryPayment(Request $request)
     {
-        $this->authorize('admin');
+        $user = Auth::user();
+        $creditsHis = $user->credits()->where('type', DataHelper::PURCHASE)->orderByDesc('id')->get();
+
+        return $this->json(
+            200,
+            'Credit history retrieved successfully.',
+            $creditsHis
+        );
+    }
+
+    public function addCredits(Request $request)
+    {
+        $user = Auth::user();
 
         $request->validate([
             'amount' => 'required|integer|min:1',
-            'description' => 'required|string|max:255',
+            'payment_method' => 'required|string|max:255',
         ]);
-
-        $user->increment('credits', $request->amount);
 
         $credit = Credit::create([
             'user_id' => $user->id,
             'amount' => $request->amount,
             'description' => $request->description,
+            'type' => DataHelper::PURCHASE,
+            'payment_method' => $request->payment_method,
         ]);
 
         return $this->json(
             200,
             'Credits added successfully.',
-            $credit,
+            $credit
+        );
+    }
+
+    // Function to approve purchase credit
+    public function approveCredit($creditId)
+    {
+        $credit = Credit::find($creditId);
+
+        if (!$credit) {
+            return $this->json(404, 'Credit not found.', null);
+        }
+
+        if ($credit->status !== DataHelper::PENDING) {
+            return $this->json(400, 'Credit is not in pending status.', null);
+        }
+
+        $credit->status = DataHelper::APPROVED;
+        $credit->save();
+
+        $user = $credit->user;
+        $user->increment('credits', $credit->amount);
+
+        return $this->json(
+            200,
+            'Credit approved successfully.',
+            $credit
         );
     }
 
@@ -71,6 +112,8 @@ class CreditController extends Controller
             'website_id' => $request->website_id,
             'amount' => $request->amount,
             'description' => $request->description,
+            'type' => DataHelper::DEDUCTION,
+            'status' => DataHelper::APPROVED
         ]);
 
         return $this->json(
