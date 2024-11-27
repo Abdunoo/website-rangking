@@ -188,8 +188,7 @@ export default {
           content: state.comment,
         });
         if (response.code === 200) {
-          toast.success('Review submitted successfully!');
-          state.reviews.push(response.data);
+          toast.success('Review submitted successfully, waiting approve from admin!');
           state.comment = '';
         }
       } catch (error) {
@@ -216,14 +215,14 @@ export default {
       }
     };
 
-    const submitContactChanges = ()=> {
+    const submitContactChanges = () => {
       if (state.newEmail.length < 2 && state.newPhoneNumber.length < 2) return;
       console.log('New Email:', state.newEmail);
       console.log('New Phone Number:', state.newPhoneNumber);
-      
+
       state.newEmail = '';
       state.newPhoneNumber = '';
-      
+
       toast.info('Contact changes not implemented yet!');
     }
 
