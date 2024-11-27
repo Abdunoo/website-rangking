@@ -22,8 +22,16 @@ class WebsiteController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 50);
-        $websites = Website::where('domain', 'LIKE', '%' . $request->input('search', '') . '%')
-            ->orderBy('rank', 'asc')
+        $orderBy = $request->input('order_by', 'rank');
+        $searchTerm = '%' . $request->input('search', '') . '%';
+        $categoryId = $request->input('cat', '');
+
+        $websites = Website::with('categories')
+            ->where('domain', 'LIKE', $searchTerm)
+            ->when($categoryId, function ($query) use ($categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->orderBy($orderBy)
             ->paginate($limit);
 
         return $this->json(

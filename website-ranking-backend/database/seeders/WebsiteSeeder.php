@@ -1,7 +1,8 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Website;
 use App\Models\Contact;
 
@@ -10,55 +11,53 @@ class WebsiteSeeder extends Seeder
     public function run()
     {
         $filePath = storage_path('app/top-1m.csv');
-        $batchSize = 1000;
+        $maxWebsites = 300;
 
         if (!file_exists($filePath)) {
-            $this->command->error("File top-1m.csv tidak ditemukan di storage/app/");
+            $this->command->error("File top-1m.csv not found in storage/app/");
             return;
         }
 
         $handle = fopen($filePath, 'r');
         if ($handle === false) {
-            $this->command->error("Gagal membuka file.");
+            $this->command->error("Failed to open the file.");
             return;
         }
 
-        $data = [];
-        while (($line = fgetcsv($handle)) !== false) {
+        $websiteCount = 0;
+
+        while (($line = fgetcsv($handle)) !== false && $websiteCount < $maxWebsites) {
             $rank = $line[0];
             $domain = $line[1];
+            $categoryId = rand(1, 9); // Random category ID between 1 and 9
 
             $website = Website::create([
                 'rank' => $rank,
-                'previous_rank' => $rank,
+                'previous_rank' => $rank + rand(-1, 1),
                 'domain' => $domain,
                 'name' => ucfirst(explode('.', $domain)[0]),
-                'category' => 'Uncategorized',
+                'rating' => rand(0, 50) / 10,
+                'category_id' => $categoryId,
             ]);
 
-            // Tambahkan dua kontak untuk setiap website
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'email',
                 'value' => 'contact' . $rank . '@' . $domain,
-                'user_id' => rand(1, 2) // Asumsi user_id 1 dan 2 ada
+                'user_id' => rand(1, 2),
             ]);
 
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'phone',
                 'value' => '+123456789' . rand(1000, 9999),
-                'user_id' => rand(1, 2)
+                'user_id' => rand(1, 2),
             ]);
 
-            if (count($data) >= $batchSize) {
-                DB::table('websites')->insert($data);
-                $data = [];
-                $this->command->info("Memasukkan $batchSize baris...");
-            }
+            $websiteCount++;
         }
 
         fclose($handle);
-        $this->command->info("Selesai mengimpor data.");
+        $this->command->info("Inserted $websiteCount websites.");
     }
 }

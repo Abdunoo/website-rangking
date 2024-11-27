@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CreditController;
@@ -27,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/websites/{website}/contacts', [ContactController::class, 'index']);
     Route::post('/websites/{website}/contacts', [ContactController::class, 'store']);
     Route::delete('/contacts/{contact}', [ContactController::class, 'destroy']);
+    Route::apiResource('/categories', CategoryController::class);
 
 
      // Review Routes

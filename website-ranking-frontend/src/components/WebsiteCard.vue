@@ -13,7 +13,7 @@
         </span>
       </div>
       <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
-        {{ website.category }}
+        {{ website.categories.name }}
       </span>
     </div>
     
@@ -25,7 +25,7 @@
     </RouterLink>
     
     <div class="text-sm text-gray-600">
-      {{ website.website }}
+      {{ website.domain }}
     </div>
   </div>
 </template>

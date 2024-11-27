@@ -23,4 +23,9 @@ class Website extends Model
         return $this->hasMany(Credit::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
 }

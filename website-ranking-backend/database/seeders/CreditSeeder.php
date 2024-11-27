@@ -1,7 +1,10 @@
 <?php
 
-use App\Models\Credit;
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
+use App\Models\Credit;
+use App\Helpers\DataHelper;
 
 class CreditSeeder extends Seeder
 {
@@ -9,14 +12,20 @@ class CreditSeeder extends Seeder
     {
         Credit::create([
             'user_id' => 1, // Admin
-            'amount' => 500,
-            'description' => 'Initial credits'
+            'website_id' => 1, // Admin's website
+            'amount' => 100,
+            'description' => 'Initial credits',
+            'type' => DataHelper::PURCHASE,
+            'status' => DataHelper::APPROVED,
         ]);
 
         Credit::create([
             'user_id' => 2, // Regular user
-            'amount' => 200,
-            'description' => 'Initial credits'
+            'website_id' => 2, // Regular user's website
+            'amount' => 100,
+            'description' => 'Initial credits',
+            'type' => DataHelper::PURCHASE,
+            'status' => DataHelper::APPROVED,
         ]);
     }
 }

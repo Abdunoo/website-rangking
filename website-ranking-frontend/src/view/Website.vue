@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+  <div v-if="website" class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
     <div class="flex flex-col md:flex-row justify-between gap-4 py-4">
       <!-- Header Section -->
       <div class="w-full md:w-auto">
@@ -131,6 +131,11 @@
       </div>
     </section>
   </div>
+  <div v-else="website" class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+    <div class="text-center text-primary text-xl mt-4">
+      Website not available
+    </div>
+  </div>
 </template>
 
 <script>
@@ -176,6 +181,7 @@ export default {
         state.userHasAccess = response.data.view_contact;
         state.reviews = response.data.reviews || [];
       } catch (error) {
+        state.website = null;
         console.error("Failed to fetch website details:", error);
       }
     };

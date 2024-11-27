@@ -4,76 +4,51 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use App\Models\User;
+use App\Models\Website;
 
 class ReviewSeeder extends Seeder
 {
     public function run()
     {
-        // Seed Reviews
-        $this->seedReviews();
+        $websites = Website::all();
 
-        // Seed Settings
-        $this->seedSettings();
+        foreach ($websites as $website) {
+            $reviews = [];
+            $reviewsCount = rand(1, 2); // Randomly generate 1 or 2 reviews per website
+
+            for ($i = 0; $i < $reviewsCount; $i++) {
+                $userId = User::inRandomOrder()->first()->id; // Random user ID
+                $reviews[] = [
+                    'user_id' => $userId,
+                    'website_id' => $website->id,
+                    'content' => $this->generateReviewContent(),
+                    'rating' => rand(1, 5), // Random rating between 1 and 5
+                    'is_approved' => (bool)rand(0, 1), // Randomly set approval status
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ];
+            }
+
+            // Bulk insert reviews for the current website
+            DB::table('reviews')->insert($reviews);
+        }
     }
 
-    private function seedReviews()
+    private function generateReviewContent()
     {
-        $reviews = [
-            [
-                'user_id' => 1, // Assuming you have users in the users table
-                'website_id' => 1, // Assuming you have websites in the websites table
-                'content' => 'This is a great website!',
-                'rating' => 5,
-                'is_approved' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            [
-                'user_id' => 2,
-                'website_id' => 1,
-                'content' => 'Needs some improvements',
-                'rating' => 3,
-                'is_approved' => false,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            // Add more reviews as needed
+        $contents = [
+            'This is a great website!',
+            'Needs some improvements.',
+            'Excellent user experience.',
+            'Not bad, but could be better.',
+            'I love the design!',
+            'Very slow and buggy.',
+            'Couldn\'t find what I was looking for.',
+            'The customer support is great!',
         ];
 
-        DB::table('reviews')->insert($reviews);
-    }
-
-    private function seedSettings()
-    {
-        $settings = [
-            [
-                'key' => 'site_name',
-                'value' => 'My Awesome Website',
-                'type' => 'string',
-                'is_public' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            [
-                'key' => 'maintenance_mode',
-                'value' => 'false',
-                'type' => 'boolean',
-                'is_public' => false,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            [
-                'key' => 'max_upload_size',
-                'value' => '10240', // 10MB in KB
-                'type' => 'integer',
-                'is_public' => false,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            // Add more settings as needed
-        ];
-
-        DB::table('settings')->insert($settings);
+        return $contents[array_rand($contents)];
     }
 }

@@ -30,7 +30,7 @@
               </td>
               <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.domain }}</td>
               <td class="h-[72px] px-4 py-2 text-[#111418] text-sm font-normal leading-normal">{{ website.name }}</td>
-              <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.category }}
+              <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.categories.name }}
               </td>
             </tr>
           </tbody>
@@ -154,18 +154,16 @@ export default {
     };
 
     watch(
-      () => dataStore.searchQuery, // Watched value
+      () => dataStore.searchQuery,
       (newQuery) => {
-        // When the query changes, fetch filtered websites
         if (newQuery) {
-          state.currentPage = 1; // Reset to first page
+          state.currentPage = 1; 
           getListWebsite(1, newQuery);
         } else {
-          // If query is empty, reset to initial state
           getListWebsite();
         }
       },
-      { immediate: true } // Run the watcher immediately on component load
+      { immediate: true }
     );
 
     onMounted(() => {

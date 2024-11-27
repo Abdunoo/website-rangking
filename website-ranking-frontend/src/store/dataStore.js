@@ -14,7 +14,8 @@ export const useDataStore = defineStore('data', {
     }, 
     profilePhoto: defaultPicture,
     credits: 0, 
-    searchQuery: '', 
+    searchQuery: '',
+    selectedCategory: '',
     defaultPicture,
   }),
   actions: {
@@ -37,8 +38,9 @@ export const useDataStore = defineStore('data', {
     decreaseCredit(value) {
       this.credits -= value;
     },
-    updateSearchQuery(query) {
-      if (query.length < 2) return;
+    updateSearchQuery(query, selectedCategory) {
+      this.selectedCategory = selectedCategory;
+      // if (query.length < 2) return;
       this.searchQuery = query;
     },
     removeCredits() {
