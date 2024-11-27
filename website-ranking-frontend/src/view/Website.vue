@@ -55,9 +55,7 @@
             <p class="text-gray-500">
               Contact details are hidden. Unlock by purchasing credits.
             </p>
-            <button @click="purchaseCredits" class="w-full bg-primary text-white py-3 rounded-lg 
-             hover:bg-blue-600 transition-colors duration-300 
-             focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button @click="purchaseCredits" class="w-full bg-primary text-white py-3 rounded-lg">
               Purchase Credits
             </button>
           </div>
@@ -133,39 +131,40 @@
 
 <script>
 import apiClient from '@/helpers/axios';
-import { ref, watch } from 'vue'
+import { reactive, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default {
   name: 'Domain',
-  setup() {
-    const website = ref({
-      name: '',
-      domain: '',
-      category: '',
-      rank: 0,
-      previous_rank: null,
-      contact: null,
-      rating: 0
+  setup({ emit }) {
+    const state = reactive({
+      website: {
+        name: '',
+        domain: '',
+        category: '',
+        rank: 0,
+        previous_rank: null,
+        contacts: [],
+        rating: 0
+      },
+      credit: {
+        amount: 100,
+        description: 'Payment get access view contact'
+      },
+      userHasAccess: false,
+      rating: 4,
+      comment: '',
+      reviews: []
     });
 
-    const credit = ref({
-      amount: 100,
-      description: 'Payment get access view contact'
-    })
-
     const route = useRoute();
-    const userHasAccess = ref(false);
-    const rating = ref(4);
-    const comment = ref('');
-    const reviews = ref([]);
 
     const fetchWebsiteDetails = async (websiteName) => {
       try {
         const response = await apiClient.get(`api/websiteByName/${websiteName}`);
-        website.value = response.data;
-        userHasAccess.value = response.data.user.user_can_access_contact === 1;
-        reviews.value = response.data.reviews || [];
+        state.website = response.data;
+        state.userHasAccess = response.data.view_contact;
+        state.reviews = response.data.reviews || [];
       } catch (error) {
         console.error("Failed to fetch website details:", error);
       }
@@ -180,13 +179,13 @@ export default {
     const submitReview = async () => {
       try {
         const response = await apiClient.post('api/reviews', {
-          website_id: website.value.id,
-          rating: rating.value,
-          content: comment.value,
+          website_id: state.website.id,
+          rating: state.rating,
+          content: state.comment,
         });
         if (response.code === 200) {
-          reviews.value.push(response.data)
-          comment.value= '';
+          state.reviews.push(response.data);
+          state.comment = '';
         }
       } catch (error) {
         console.error("Failed to submit review:", error);
@@ -195,12 +194,14 @@ export default {
 
     const purchaseCredits = async () => {
       try {
-        const response = await apiClient.post(`api/credits/deduct/${website.value.user.id}`, {
-          amount: credit.value.amount,
-          description: credit.value.description,
+        const response = await apiClient.post(`api/credits/deduct`, {
+          website_id: state.website.id,
+          amount: state.credit.amount,
+          description: state.credit.description,
         });
         if (response.code === 200) {
-          userHasAccess.value = true;
+          state.userHasAccess = true;
+          emit('update-credits', response.data.amount);
         }
       } catch (error) {
         console.error("Failed to get access view contact:", error);
@@ -208,13 +209,8 @@ export default {
     };
 
     return {
-      website,
-      userHasAccess,
-      rating,
-      comment,
-      reviews,
+      ...toRefs(state),
       submitReview,
-      credit,
       purchaseCredits,
     };
   }

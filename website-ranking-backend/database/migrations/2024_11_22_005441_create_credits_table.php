@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('credits', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('amount'); // Jumlah kredit (positif untuk penambahan, negatif untuk pengurangan)
-            $table->string('description')->nullable(); // Deskripsi transaksi
+            $table->foreignId('website_id')->constrained()->onDelete('cascade');
+            $table->integer('amount');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

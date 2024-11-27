@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('contacts', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->unsignedBigInteger('website_id'); // Foreign key ke tabel websites
             $table->string('type'); // Jenis kontak (email, Skype, Telegram, dll.)
             $table->string('value'); // Nilai kontak (contoh: alamat email atau username Telegram)

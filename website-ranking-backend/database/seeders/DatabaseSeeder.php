@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => bcrypt('password123'),
             'role' => 'user',
-            'credits' => 500
+            'credits' => 200
         ]);
 
         $filePath = storage_path('app/top-1m.csv');
@@ -97,14 +97,16 @@ class DatabaseSeeder extends Seeder
         $this->command->info("Selesai mengimpor data.");
 
         Credit::create([
-            'user_id' => 1, // Admin
-            'amount' => 500,
+            'user_id' => 2, // Admin
+            'website_id' => 1, // Admin
+            'amount' => 100,
             'description' => 'Initial credits'
         ]);
 
         Credit::create([
             'user_id' => 2, // Regular user
-            'amount' => 200,
+            'website_id' => 2, // Regular user
+            'amount' => 100,
             'description' => 'Initial credits'
         ]); {
             $reviews = [

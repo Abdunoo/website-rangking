@@ -6,6 +6,7 @@ use App\Helpers\ApplicationResponse;
 use App\Models\Credit;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CreditController extends Controller
 {
@@ -47,12 +48,14 @@ class CreditController extends Controller
         );
     }
 
-    public function deductCredits(Request $request, User $user)
+    public function deductCredits(Request $request)
     {
         $request->validate([
             'amount' => 'required|integer|min:1',
             'description' => 'required|string|max:255',
         ]);
+
+        $user = $request->user();
 
         if ($user->credits < $request->amount) {
             return $this->json(
@@ -62,11 +65,10 @@ class CreditController extends Controller
         }
 
         $user->decrement('credits', $request->amount);
-        $user->user_can_access_contact = 1;
-        $user->save();
 
         $credit = Credit::create([
             'user_id' => $user->id,
+            'website_id' => $request->website_id,
             'amount' => -$request->amount,
             'description' => $request->description,
         ]);

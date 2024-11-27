@@ -1,59 +1,3 @@
-<script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import Button from '@/components/ui/Button.vue'
-import apiClient from '@/helpers/axios';
-
-export default {
-  components: {
-    Button
-  },
-  emits: ['update-credits'],
-  setup(props, { emit }) {
-    const email = ref('')
-    const password = ref('')
-    const errorMessage = ref('')
-
-    const router = useRouter()
-
-    const handleLogin = async () => {
-      try {
-        if (!email.value || !password.value) {
-          errorMessage.value = 'Please fill in all fields'
-          return
-        }
-
-        // Direct API call instead of using a service
-        const response = await apiClient.post('/api/login', {
-          email: email.value,
-          password: password.value
-        })
-
-        if (response.code === 200) {
-          // Store token, user info, etc.
-          localStorage.setItem('token', response.data.token)
-          localStorage.setItem('_usr', JSON.stringify(response.data.user))
-          emit('update-credits', response.data.user.credits);
-          console.log('update-credits', response.data.user.credits);
-          router.push('/')
-        } else {
-          errorMessage.value = 'Invalid credentials'
-        }
-      } catch (error) {
-        errorMessage.value = 'Login failed. Please try again.'
-      }
-    }
-
-    return {
-      email,
-      password,
-      errorMessage,
-      handleLogin
-    }
-  }
-}
-</script>
-
 <template>
   <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
@@ -100,3 +44,59 @@ export default {
     </div>
   </div>
 </template>
+
+<script>
+import { reactive, ref, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
+import Button from '@/components/ui/Button.vue'
+import apiClient from '@/helpers/axios';
+import { useDataStore } from '@/store/dataStore.js';
+
+export default {
+  components: {
+    Button
+  },
+  setup() {
+    const state = reactive({
+      email: '',
+      password: '',
+      errorMessage: ''
+    })
+
+    const router = useRouter()
+    const dataStore = useDataStore();
+
+    const handleLogin = async () => {
+      try {
+        if (!state.email || !state.password) {
+          errorMessage.value = 'Please fill in all fields'
+          return
+        }
+
+        const response = await apiClient.post('/api/login', {
+          email: state.email,
+          password: state.password
+        })
+
+        if (response.code === 200) {
+          dataStore.updateCredits(response.data.user.credits);
+          dataStore.updatePhotoProfile(response.data.user.photo);
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('_usr', JSON.stringify(response.data.user));
+          router.push('/')
+        } else {
+          state.errorMessage = 'Invalid credentials'
+        }
+      } catch (error) {
+        state.errorMessage = 'Login failed. Please try again.'
+      }
+    }
+
+    return {
+      ...toRefs(state),
+      handleLogin
+    }
+  }
+}
+</script>
+

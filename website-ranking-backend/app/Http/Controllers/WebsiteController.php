@@ -44,6 +44,11 @@ class WebsiteController extends Controller
             );
         }
 
+        $website->view_contact = $website->credits()
+        ->where('user_id', $user->id)
+        ->where('credits.website_id', $website->id)
+        ->exists();
+
         $website->user = $user;
 
         return $this->json(

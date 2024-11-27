@@ -13,11 +13,15 @@ Route::get('/websites', [WebsiteController::class, 'index']);
 Route::get('/websites/{website}', [WebsiteController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', [AuthController::class, 'me'])->name('me');
+    Route::get('/auth/me', [AuthController::class, 'me'])->name('me');
+    Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
+    Route::delete('/auth/profile/photo', [AuthController::class, 'removeProfilePhoto']);
+
+
     Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
     Route::get('/credits', [CreditController::class, 'index']);
     Route::post('/credits/add/{user}', [CreditController::class, 'addCredits']);
-    Route::post('/credits/deduct/{user}', [CreditController::class, 'deductCredits']);
+    Route::post('/credits/deduct', [CreditController::class, 'deductCredits']);
     Route::put('/websites/{website}', [WebsiteController::class, 'update']);
     Route::delete('/websites/{website}', [WebsiteController::class, 'destroy']);
     Route::get('/websites/{website}/contacts', [ContactController::class, 'index']);

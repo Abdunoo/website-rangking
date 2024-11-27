@@ -18,4 +18,9 @@ class Website extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
 }

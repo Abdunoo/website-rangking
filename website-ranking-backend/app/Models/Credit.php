@@ -12,4 +12,14 @@ class Credit extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function review()
+    {
+        return $this->belongsTo(Review::class);
+    }
+
+    public function website()
+    {
+        return $this->belongsTo(Website::class);
+    }
+
 }

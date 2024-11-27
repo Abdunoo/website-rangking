@@ -79,6 +79,7 @@ import { onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from 'vue';
 import { ArrowUpIcon } from '@heroicons/vue/24/solid';
 import { debounce } from 'lodash-es';
 import WebsiteCard from '@/components/WebsiteCard.vue';
+import { useDataStore } from '@/store/dataStore';
 
 export default {
   name: 'Home',
@@ -101,9 +102,10 @@ export default {
     });
 
     const showScrollTop = ref(false);
+    const dataStore = useDataStore();
 
     // Create a debounced version of getListWebsite
-    const debouncedGetListWebsite = debounce(async (page = 1, searchQuery = '') => {
+    const getListWebsite = debounce(async (page = 1, searchQuery = '') => {
       try {
         const response = await apiClient.get(`api/websites?page=${page}&search=${searchQuery}`);
         state.websites = response.data.data;
@@ -114,10 +116,6 @@ export default {
         state.errorMessage = 'Failed to load data. Please try again later.'; // Set error message
       }
     }, 500); // 500ms delay
-
-    const getListWebsite = (page = 1, searchQuery = '') => {
-      debouncedGetListWebsite(page, searchQuery);
-    };
 
     const prevPage = () => {
       if (state.currentPage > 1) {
@@ -146,7 +144,7 @@ export default {
     };
 
     watch(
-      () => props.searchQuery, // Watched value
+      () => dataStore.searchQuery, // Watched value
       (newQuery) => {
         // When the query changes, fetch filtered websites
         if (newQuery) {
@@ -168,7 +166,7 @@ export default {
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll);
       // Cancel any pending debounced calls
-      debouncedGetListWebsite.cancel();
+      getListWebsite.cancel();
     });
 
     return {
