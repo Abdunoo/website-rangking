@@ -204,6 +204,7 @@ export default {
     };
 
     const purchaseCredits = async () => {
+      if (dataStore.credits < state.credit.amount) {toast.info('Your credit amount is insufficient!, please buy credit first'); return;}
       try {
         const response = await apiClient.post(`api/credits/deduct`, {
           website_id: state.website.id,

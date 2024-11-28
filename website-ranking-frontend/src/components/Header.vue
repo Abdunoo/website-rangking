@@ -12,23 +12,16 @@
     <div class="flex items-center space-x-4 md:space-x-8">
       <div class="relative max-w-xs mx-4 flex-grow">
         <div class="flex items-center rounded-xl bg-gray-100 border border-gray-300 text-gray-500">
-          <div class="pl-4 flex items-center">
-            <MagnifyingGlassIcon class="w-6 h-6 " />
+          <div class="pl-2 flex items-center">
+            <MagnifyingGlassIcon class="w-4 h-4 " />
           </div>
-          
-          <input
-            placeholder="Search"
-            class="w-full px-4 py-2 bg-gray-100 focus:outline-none rounded-l-xl"
-            v-model="searchQuery"
-            @input="debouncedSearch"
-          />
-          
-          <select
-            id="categoryFilter"
+
+          <input placeholder="Search" class="w-full px-4 py-2 bg-gray-100 focus:outline-none rounded-l-xl"
+            v-model="searchQuery" @input="debouncedSearch" />
+
+          <select id="categoryFilter"
             class="px-4 py-2 bg-gray-100 border-l border-gray-300 focus:outline-none focus:ring focus:ring-gray-300 rounded-r-xl"
-            v-model="selectedCategory"
-            @change="debouncedSearch"
-          >
+            v-model="selectedCategory" @change="debouncedSearch">
             <option value="">All Categories</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -127,7 +120,7 @@ export default {
         return;
       }
       try {
-        const response = await apiClient.get('/api/websites', {
+        const response = await apiClient.get('/api/public/websites', {
           params: { search: state.searchQuery, limit: 5, cat: state.selectedCategory }
         });
         state.searchResults = response.data.data;
@@ -138,7 +131,7 @@ export default {
 
     const getLstCategories = debounce(async () => {
       try {
-        const response = await apiClient.get('/api/categories');
+        const response = await apiClient.get('/api/public/categories');
         state.categories = response.data.data;
       } catch (error) {
         console.error(error);
@@ -163,7 +156,7 @@ export default {
 
     onMounted(() => {
       document.addEventListener('click', handleClickOutside);
-      dataStore.fetchUserData();
+      // dataStore.fetchUserData();
       getLstCategories();
 
     });

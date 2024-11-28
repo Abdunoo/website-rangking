@@ -91,12 +91,6 @@ export default {
     ArrowUpIcon,
     WebsiteCard
   },
-  props: {
-    searchQuery: {
-      type: String,
-      default: null,
-    },
-  },
   setup(props) {
     const state = reactive({
       websites: [],
@@ -111,7 +105,10 @@ export default {
     // Create a debounced version of getListWebsite
     const getListWebsite = debounce(async (page = 1, searchQuery = '') => {
       try {
-        const response = await apiClient.get(`api/websites?page=${page}&search=${searchQuery}`);
+        // const response = await apiClient.get(`api/public/websites?page=${page}&search=${searchQuery}`);
+        const response = await apiClient.get('/api/public/websites', {
+          params: { search: searchQuery, page: page, cat: dataStore.selectedCategory }
+        });
         state.websites = response.data.data;
         state.totalPages = response.data.last_page || 1;
         state.errorMessage = ''; // Clear error message on success
@@ -124,14 +121,14 @@ export default {
     const prevPage = () => {
       if (state.currentPage > 1) {
         state.currentPage--;
-        getListWebsite(state.currentPage, props.searchQuery);
+        getListWebsite(state.currentPage, dataStore.searchQuery);
       }
     };
 
     const nextPage = () => {
       if (state.currentPage < state.totalPages) {
         state.currentPage++;
-        getListWebsite(state.currentPage, props.searchQuery);
+        getListWebsite(state.currentPage, dataStore.searchQueryy);
       }
     };
 
@@ -158,7 +155,20 @@ export default {
       (newQuery) => {
         if (newQuery) {
           state.currentPage = 1; 
-          getListWebsite(1, newQuery);
+          getListWebsite(1, newQuery, dataStore.selectedCategory);
+        } else {
+          getListWebsite();
+        }
+      },
+      { immediate: true }
+    );
+
+    watch(
+      () => dataStore.selectedCategory,
+      (selectedCategory) => {
+        if (selectedCategory) {
+          state.currentPage = 1; 
+          getListWebsite(1, dataStore.searchQuery,selectedCategory);
         } else {
           getListWebsite();
         }

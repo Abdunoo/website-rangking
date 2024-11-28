@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::get('/websites', [WebsiteController::class, 'index']);
-Route::get('/websites/{website}', [WebsiteController::class, 'show']);
+Route::get('/public/websites', [WebsiteController::class, 'index']);
+Route::get('/public/categories', [CategoryController::class, 'index']);
+Route::get('/public/websites/{website}', [WebsiteController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me'])->name('me');
