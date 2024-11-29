@@ -3,14 +3,9 @@ import { ref, watch } from 'vue';
 import Header from './components/Header.vue';
 import BottomMenu from './components/BottomMenu.vue';
 import LoadingIndicator from '@/components/ui/LoadingIndicator.vue'
-import { isLoading } from './helpers/axios';
+import { useDataStore } from './store/dataStore';
 
-const loading = ref(false)
-
-watch(isLoading, (newValue) => {
-  loading.value = newValue
-})
-
+const dataStore = useDataStore();
 </script>
 
 <template>
@@ -20,7 +15,7 @@ watch(isLoading, (newValue) => {
       <router-view />
     </main>
     <BottomMenu />
-    <LoadingIndicator v-if="loading" />
+    <LoadingIndicator v-if="dataStore.loading" />
   </section>
 </template>
 

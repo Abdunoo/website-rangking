@@ -73,12 +73,10 @@
 </template>
 
 <script>
-import {
-  MagnifyingGlassIcon,
-  CreditCardIcon,
-  UserIcon,
-  KeyIcon
-} from '@heroicons/vue/24/solid';
+import MagnifyingGlassIcon from '@heroicons/vue/24/solid/MagnifyingGlassIcon';
+import CreditCardIcon from '@heroicons/vue/24/solid/CreditCardIcon';
+import UserIcon from '@heroicons/vue/24/solid/UserIcon';
+import KeyIcon from '@heroicons/vue/24/solid/KeyIcon';
 import apiClient from '@/helpers/axios';
 import { onMounted, onBeforeUnmount, reactive, toRefs } from 'vue';
 import router from '@/router';
@@ -121,6 +119,7 @@ export default {
         state.searchResults = [];
         return;
       }
+      dataStore.setLoading(true);
       try {
         const response = await apiClient.get('/api/public/websites', {
           params: { search: state.searchQuery, limit: 5, cat: state.selectedCategory }
@@ -129,15 +128,18 @@ export default {
       } catch (error) {
         console.error(error);
       }
+      dataStore.setLoading(false);
     }, 500);
 
     const getLstCategories = debounce(async () => {
+      dataStore.setLoading(true);
       try {
         const response = await apiClient.get('/api/public/categories');
         state.categories = response.data.data;
       } catch (error) {
         console.error(error);
       }
+      dataStore.setLoading(false);
     }, 500);
 
     const selectResult = (result) => {

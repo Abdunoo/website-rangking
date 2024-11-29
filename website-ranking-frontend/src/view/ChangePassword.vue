@@ -58,6 +58,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/helpers/axios'
 import { useToast } from 'vue-toastification';
+import { useDataStore } from '@/store/dataStore';
 
 export default {
     name: 'ChangePassword',
@@ -68,6 +69,7 @@ export default {
         const errorMessage = ref('')
         const router = useRouter()
         const toast = useToast();
+        const dataStore = useDataStore();
 
         const passwordStrength = computed(() => {
             const password = newPassword.value
@@ -102,19 +104,19 @@ export default {
                 return
             }
 
+            dataStore.setLoading(true);
             try {
                 await apiClient.post('/api/change-password', {
                     current_password: currentPassword.value,
                     password: newPassword.value,
                     password_confirmation: confirmPassword.value
                 })
-
                 toast.success('Password changed successfully')
-
-                router.push('/profile')
+                router.push('/profile');
             } catch (error) {
                 errorMessage.value = error.response?.data?.message || 'Failed to change password. Please try again.'
             }
+            dataStore.setLoading(false);
         }
 
         return {

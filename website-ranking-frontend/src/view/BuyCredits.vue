@@ -88,6 +88,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/helpers/axios'
 import { useToast } from 'vue-toastification';
+import { useDataStore } from '@/store/dataStore';
 
 // Credit Pack Definitions
 const creditPacks = [
@@ -140,6 +141,7 @@ const selectedPaymentMethod = ref(null)
 const adminMessage = ref('')
 const router = useRouter()
 const toast = useToast();
+const dataStore = useDataStore();
 
 const selectPack = (pack) => {
   selectedPack.value = pack
@@ -154,6 +156,7 @@ const isReadyToPurchase = computed(() => {
 })
 
 const processPurchase = async () => {
+  dataStore.setLoading(true);
   try {
     const response = await apiClient.post('/api/credits/purchase-credits', {
       amount: selectedPack.value.credits,
@@ -169,6 +172,7 @@ const processPurchase = async () => {
     console.error('Purchase failed:', error)
     toast.error('Purchase failed. Please try again.')
   }
+  dataStore.setLoading(false);
 }
 </script>
 

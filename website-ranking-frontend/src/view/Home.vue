@@ -19,59 +19,40 @@
               @click="toDetail(website.name)">
               <td class="h-[72px] px-4 py-2 text-[#111418] text-sm font-normal leading-normal">{{ website.rank }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <span 
-                  :class="[
-                    'text-sm',
-                    website.previous_rank >= website.rank ? 'text-primary' : 'text-danger'
-                  ]"
-                >
+                <span :class="['text-sm', website.previous_rank >= website.rank ? 'text-primary' : 'text-danger']">
                   {{ getRankChange(website.rank, website.previous_rank) }}
                 </span>
               </td>
               <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.domain }}</td>
               <td class="h-[72px] px-4 py-2 text-[#111418] text-sm font-normal leading-normal">{{ website.name }}</td>
-              <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.categories.name }}
-              </td>
+              <td class="h-[72px] px-4 py-2 text-secondary text-sm font-normal leading-normal">{{ website.categories.name }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div v-if="errorMessage" class="text-danger text-sm mt-2">{{ errorMessage }}</div>
       <!-- Pagination Buttons -->
-      <div class="flex justify-between mt-4">
-        <button
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
-          :disabled="currentPage === 1" @click="prevPage">
-          Previous
-        </button>
-        <button
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
-          :disabled="currentPage === totalPages" @click="nextPage">
-          Next
-        </button>
-      </div>
+      <PaginationButtons 
+        :currentPage="currentPage" 
+        :totalPages="totalPages" 
+        @prev="prevPage" 
+        @next="nextPage" 
+      />
     </div>
   </div>
+
   <!-- Mobile cards -->
   <div class="md:hidden divide-y divide-gray-200 w-full space-y-2 pb-10">
     <WebsiteCard v-for="website in websites" :key="website.id" :website="website" />
-    <!-- Pagination Buttons -->
-    <div class="flex justify-between mt-4">
-        <button
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
-          :disabled="currentPage === 1" @click="prevPage">
-          Previous
-        </button>
-        <button
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-primary hover-bg-primary disabled:bg-gray-200 disabled:cursor-not-allowed"
-          :disabled="currentPage === totalPages" @click="nextPage">
-          Next
-        </button>
-      </div>
+    <PaginationButtons 
+      :currentPage="currentPage" 
+      :totalPages="totalPages" 
+      @prev="prevPage" 
+      @next="nextPage" 
+    />
   </div>
 
-  <button v-show="showScrollTop" @click="scrollToTop"
-    class="fixed bottom-16 md:bottom-5  right-5 bg-primary text-white rounded-full p-4 shadow-lg hover:hover-bg-primary focus:outline-none transition-all">
+  <button v-show="showScrollTop" @click="scrollToTop" class="fixed bottom-1/4 md:bottom-5 right-5 bg-primary text-white rounded-full p-4 shadow-lg hover:bg-primary focus:outline-none transition-all">
     <ArrowUpIcon class="size-6 text-white" />
   </button>
 </template>
@@ -84,12 +65,14 @@ import { ArrowUpIcon } from '@heroicons/vue/24/solid';
 import { debounce } from 'lodash-es';
 import WebsiteCard from '@/components/WebsiteCard.vue';
 import { useDataStore } from '@/store/dataStore';
+import PaginationButtons from '@/components/ui/PaginationButtons.vue';
 
 export default {
   name: 'Home',
   components: {
     ArrowUpIcon,
-    WebsiteCard
+    WebsiteCard,
+    PaginationButtons // Register the new component
   },
   setup(props) {
     const state = reactive({
@@ -102,21 +85,22 @@ export default {
     const showScrollTop = ref(false);
     const dataStore = useDataStore();
 
-    // Create a debounced version of getListWebsite
     const getListWebsite = debounce(async (page = 1, searchQuery = '') => {
+      dataStore.setLoading(true);
       try {
-        // const response = await apiClient.get(`api/public/websites?page=${page}&search=${searchQuery}`);
         const response = await apiClient.get('/api/public/websites', {
           params: { search: searchQuery, page: page, cat: dataStore.selectedCategory }
         });
         state.websites = response.data.data;
         state.totalPages = response.data.last_page || 1;
-        state.errorMessage = ''; // Clear error message on success
+        state.errorMessage = '';
+        scrollToTop();
       } catch (err) {
         console.error("An error occurred:", err);
-        state.errorMessage = 'Failed to load data. Please try again later.'; // Set error message
+        state.errorMessage = 'Failed to load data. Please try again later.';
       }
-    }, 500); // 500ms delay
+      dataStore.setLoading(false);
+    }, 500);
 
     const prevPage = () => {
       if (state.currentPage > 1) {
@@ -128,15 +112,14 @@ export default {
     const nextPage = () => {
       if (state.currentPage < state.totalPages) {
         state.currentPage++;
-        getListWebsite(state.currentPage, dataStore.searchQueryy);
+        getListWebsite(state.currentPage, dataStore.searchQuery);
       }
     };
 
-    const getRankChange = (current, previous)=> {
+    const getRankChange = (current, previous) => {
       const diff = previous - current;
-      if (diff >= 0) return `↑${Math.abs(diff)}`
-      return `↓${Math.abs(diff)}`;
-    }
+      return diff >= 0 ? `↑${Math.abs(diff)}` : `↓${Math.abs(diff)}`;
+    };
 
     const toDetail = (name) => {
       router.push(`/${name}`);
@@ -153,12 +136,8 @@ export default {
     watch(
       () => dataStore.searchQuery,
       (newQuery) => {
-        if (newQuery) {
-          state.currentPage = 1; 
-          getListWebsite(1, newQuery, dataStore.selectedCategory);
-        } else {
-          getListWebsite();
-        }
+        state.currentPage = 1;
+        getListWebsite(1, newQuery);
       },
       { immediate: true }
     );
@@ -166,12 +145,8 @@ export default {
     watch(
       () => dataStore.selectedCategory,
       (selectedCategory) => {
-        if (selectedCategory) {
-          state.currentPage = 1; 
-          getListWebsite(1, dataStore.searchQuery,selectedCategory);
-        } else {
-          getListWebsite();
-        }
+        state.currentPage = 1;
+        getListWebsite(1, dataStore.searchQuery);
       },
       { immediate: true }
     );
@@ -183,7 +158,6 @@ export default {
 
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll);
-      // Cancel any pending debounced calls
       getListWebsite.cancel();
     });
 

@@ -69,23 +69,24 @@ export default {
     const toast = useToast();
 
     const handleLogin = async () => {
-      try {
-        if (!state.email || !state.password) {
+      if (!state.email || !state.password) {
           errorMessage.value = 'Please fill in all fields'
           return
-        }
+      }
 
+      dataStore.setLoading(true);
+      try {
         const response = await apiClient.post('/api/login', {
           email: state.email,
           password: state.password
         })
 
         if (response.code === 200) {
-          toast.success('Login successful');
           dataStore.updateCredits(response.data.user.credits);
           if (response.data.user.photo) dataStore.updatePhotoProfile(response.data.user.photo);
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('_usr', JSON.stringify(response.data.user));
+          toast.success('Login successful');
           router.push('/')
         } else {
           state.errorMessage = 'Invalid credentials'
@@ -93,6 +94,7 @@ export default {
       } catch (error) {
         state.errorMessage = 'Login failed. Please try again.'
       }
+      dataStore.setLoading(false);
     }
 
     return {

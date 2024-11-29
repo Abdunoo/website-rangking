@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
 import axios from 'axios'
 import apiClient from '@/helpers/axios';
+import { useDataStore } from '@/store/dataStore';
 
 export default {
   components: {
@@ -15,12 +16,12 @@ export default {
     const password = ref('')
     const confirmPassword = ref('')
     const errorMessage = ref('')
+    const dataStore = useDataStore();
 
     const router = useRouter()
 
     const handleRegister = async () => {
-      try {
-        if (!name.value || !email.value || !password.value) {
+      if (!name.value || !email.value || !password.value) {
           errorMessage.value = 'Please fill in all fields'
           return
         }
@@ -29,19 +30,19 @@ export default {
           errorMessage.value = 'Passwords do not match'
           return
         }
-
-        // Direct API call for registration
-        await apiClient.post('/api/register', {
+      try {
+        dataStore.setLoading(true);
+        const response = await apiClient.post('/api/register', {
           name: name.value,
           email: email.value,
           password: password.value,
           password_confirmation: confirmPassword.value
         })
-
-        router.push('/login')
+          router.push('/login')
       } catch (error) {
         errorMessage.value = 'Registration failed. Please try again.'
       }
+      dataStore.setLoading(false);
     }
 
     return {

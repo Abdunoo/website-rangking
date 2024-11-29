@@ -17,6 +17,7 @@ export const useDataStore = defineStore('data', {
     searchQuery: '',
     selectedCategory: '',
     defaultPicture,
+    loading: false,
   }),
   actions: {
     async fetchUserData() {
@@ -51,6 +52,12 @@ export const useDataStore = defineStore('data', {
     },
     updatePhotoProfile(value) {
       this.profilePhoto = value;
-    }
+    },
+    setLoading(value) {
+      this.loading = value;
+      console.log(
+        'setLoading', value
+      )
+    },
   },
 });

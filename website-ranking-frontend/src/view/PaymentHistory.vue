@@ -72,19 +72,23 @@
 <script>
 import { ref, onMounted } from 'vue';
 import apiClient from '@/helpers/axios';
+import { useDataStore } from '@/store/dataStore';
 
 export default {
   name: 'PaymentHistory',
   setup() {
     const payments = ref([]);
+    const dataStore = useDataStore();
 
     const fetchPaymentHistory = async () => {
+      dataStore.setLoading(true);
       try {
         const response = await apiClient.get('/api/credits/purchase-history');
         payments.value = response.data;
       } catch (error) {
         console.error('Error fetching payment history:', error);
       }
+      dataStore.setLoading(false);
     };
 
     const formatDate = (datetime) => {
