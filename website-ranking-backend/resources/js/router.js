@@ -7,6 +7,7 @@ import Users from './views/Users.vue';
 import Credits from './views/Credits.vue';
 import Reviews from './views/Reviews.vue';
 import Settings from './views/Settings.vue';
+import Login from './views/Login.vue';
 
 const routes = [
   {
@@ -49,6 +50,17 @@ const routes = [
     name: 'Settings',
     component: Settings,
   },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+  },
+//   {
+//     path: '/:catchAll(.*)',
+//     name: '404',
+//     component: NotFound,
+//   },
+
 ];
 
 const router = createRouter({

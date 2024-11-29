@@ -71,7 +71,7 @@
   </div>
 
   <button v-show="showScrollTop" @click="scrollToTop"
-    class="fixed bottom-5 right-5 bg-primary text-white rounded-full p-4 shadow-lg hover:hover-bg-primary focus:outline-none transition-all">
+    class="fixed bottom-16 md:bottom-5  right-5 bg-primary text-white rounded-full p-4 shadow-lg hover:hover-bg-primary focus:outline-none transition-all">
     <ArrowUpIcon class="size-6 text-white" />
   </button>
 </template>
@@ -134,8 +134,8 @@ export default {
 
     const getRankChange = (current, previous)=> {
       const diff = previous - current;
-      if (diff >= 0) return `↑${diff}`
-      return `↓${diff}`;
+      if (diff >= 0) return `↑${Math.abs(diff)}`
+      return `↓${Math.abs(diff)}`;
     }
 
     const toDetail = (name) => {

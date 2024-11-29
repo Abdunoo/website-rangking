@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Website;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -10,12 +11,26 @@ class CategoryController extends Controller
     /**
      * Display a listing of the categories.
      */
+    public function listCategories(Request $request)
+    {
+        $searchTerm = '%' . $request->input('search', '') . '%';
+        $categories = Category::where('name', 'LIKE', $searchTerm)
+            ->orderBy('name', 'asc')
+            ->paginate($request->input('limit', 20));
+
+        return $this->json(200, 'Categories retrieved successfully.', $categories);
+    }
+
     public function index(Request $request)
     {
         $searchTerm = '%' . $request->input('search', '') . '%';
         $categories = Category::where('name', 'LIKE', $searchTerm)
             ->orderBy('name', 'asc')
             ->paginate($request->input('limit', 20));
+
+        foreach ($categories as $key => $cat) {
+            $cat['websiteCount'] = Website::where('category_id', $cat->id)->count();
+        }
 
         return $this->json(200, 'Categories retrieved successfully.', $categories);
     }

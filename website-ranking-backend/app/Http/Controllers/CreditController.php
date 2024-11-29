@@ -6,6 +6,7 @@ use App\Helpers\ApplicationResponse;
 use App\Helpers\DataHelper;
 use App\Models\Credit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,13 +18,27 @@ class CreditController extends Controller
 
     public function index(Request $request)
     {
-        $user = $request->user();
-        $credits = $user->credits()->latest()->get();
+        $oneMonthAgo = Carbon::now()->subMonth();
+
+        $credits = Credit::with('user')->orderByDesc('created_at')->get();
+
+        $activeUsers = Credit::where('created_at', '>=', $oneMonthAgo)
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $pendingTransactions = Credit::where('status', 'pending')->count();
+
+        $data = [
+            'credits' => $credits,
+            'totalCredits' => $credits->sum('amount'),
+            'activeUsers' => $activeUsers,
+            'pendingTransactions' => $pendingTransactions,
+        ];
 
         return $this->json(
             200,
             'Credit history retrieved successfully.',
-            $credits
+            $data
         );
     }
 

@@ -10,7 +10,7 @@
                 <thead>
                     <tr class="border-b">
                         <th class="text-left py-3">Name</th>
-                        <th class="text-left py-3">URL</th>
+                        <th class="text-left py-3">Domain</th>
                         <th class="text-left py-3">Category</th>
                         <th class="text-left py-3">Rank</th>
                         <th class="text-left py-3">Actions</th>
@@ -19,8 +19,8 @@
                 <tbody>
                     <tr v-for="website in websites" :key="website.id" class="border-b">
                         <td class="py-3">{{ website.name }}</td>
-                        <td class="py-3">{{ website.url }}</td>
-                        <td class="py-3">{{ website.category }}</td>
+                        <td class="py-3">{{ website.domain }}</td>
+                        <td class="py-3">{{ website.categories.name }}</td>
                         <td class="py-3">#{{ website.rank }}</td>
                         <td class="py-3">
                             <button class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
@@ -30,14 +30,72 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="flex justify-between">
+            <button
+                class="btn btn-secondary"
+                @click="prevPage"
+                :disabled="currentPage === 1">
+                Previous
+            </button>
+            <button
+                class="btn btn-secondary"
+                @click="nextPage"
+                :disabled="websites.length < itemsPerPage">
+                Next
+            </button>
+        </div>
     </div>
 </template>
-<script setup>
-import { ref } from 'vue';
 
-const websites = ref([
-    { id: 1, name: 'Example.com', url: 'https://example.com', category: 'Technology', rank: 1 },
-    { id: 2, name: 'Sample.com', url: 'https://sample.com', category: 'Business', rank: 2 },
-    // Add more sample data as needed
-]);
+<script>
+import { onMounted, reactive, ref, toRefs } from 'vue';
+import apiClient from '../helpers/axios';
+
+export default {
+    name: 'Websites',
+    setup() {
+        const state = reactive({
+            websites: [],
+            currentPage: 1,
+            itemsPerPage: 10,
+        });
+
+        const getLstWebsites = async () => {
+            try {
+                const response = await apiClient.get(`/api/admin/websites`,{
+                    params: {
+                        page: state.currentPage,
+                        limit: state.itemsPerPage
+                    }
+                });
+                state.websites = response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const nextPage = () => {
+            state.currentPage++;
+            getLstWebsites();
+        };
+
+        const prevPage = () => {
+            if (state.currentPage > 1) {
+                state.currentPage--;
+                getLstWebsites();
+            }
+        };
+
+        onMounted(() => {
+            getLstWebsites();
+        });
+
+        return {
+            ...toRefs(state),
+            nextPage,
+            prevPage,
+        };
+    },
+};
 </script>

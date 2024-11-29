@@ -19,20 +19,11 @@ class ReviewController extends Controller
     /**
      * Display reviews for a specific website
      */
-    public function index(Request $request, $websiteId)
+    public function index(Request $request)
     {
-        $reviews = Review::where('website_id', $websiteId)
-            ->where('is_approved', true)
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $limit = $request->input('limit', 10);
 
-        $reviews->user->photo = $reviews->user->photo ? Storage::url($reviews->user->photo) : null;
-
-        $data = [
-            'reviews' => $reviews,
-            'total_reviews' => $reviews->total()
-        ];
+        $reviews = Review::with('website', 'user')->orderByDesc('id')->paginate($limit);
 
         return $this->json(
             200,

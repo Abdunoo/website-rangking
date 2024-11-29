@@ -12,7 +12,6 @@
                         <th class="text-left py-3">Name</th>
                         <th class="text-left py-3">Email</th>
                         <th class="text-left py-3">Role</th>
-                        <th class="text-left py-3">Status</th>
                         <th class="text-left py-3">Join Date</th>
                         <th class="text-left py-3">Actions</th>
                     </tr>
@@ -24,10 +23,7 @@
                         <td class="py-3">
                             <span class="badge badge-success">{{ user.role }}</span>
                         </td>
-                        <td class="py-3">
-                            <span class="badge badge-success">{{ user.status }}</span>
-                        </td>
-                        <td class="py-3">{{ user.joinDate }}</td>
+                        <td class="py-3">{{ user.created_at }}</td>
                         <td class="py-3">
                             <button class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
                             <button class="text-red-600 hover:text-red-800">Deactivate</button>
@@ -39,25 +35,33 @@
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
+import { onMounted, reactive, ref, toRefs } from 'vue';
+import apiClient from '../helpers/axios';
 
-const users = ref([
-    {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: 'Admin',
-        status: 'Active',
-        joinDate: '2024-01-15'
-    },
-    {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        role: 'Moderator',
-        status: 'Active',
-        joinDate: '2024-02-01'
-    },
-]);
+export default {
+    setup() {
+        const state = reactive({
+            users: [],
+        });
+
+        const getLstUsers = async () => {
+            try {
+                const response = await apiClient.get('/api/admin/users');
+                state.users = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        onMounted(() => {
+            getLstUsers();
+        })
+
+        return {
+            ...toRefs(state),
+        }
+
+    }
+}
 </script>

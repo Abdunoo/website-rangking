@@ -18,13 +18,35 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
+import { onMounted, reactive, ref, toRefs } from 'vue';
+import apiClient from '../helpers/axios';
 
-const categories = ref([
-  { id: 1, name: 'Technology', websiteCount: 45 },
-  { id: 2, name: 'Business', websiteCount: 32 },
-  { id: 3, name: 'Entertainment', websiteCount: 28 },
-]);
+export default {
+    name: 'Categories',
+    setup() {
+        const state = reactive({
+            categories: [],
+
+        })
+
+        const getLstcategories = async () => {
+            try {
+                const response = await apiClient.get(`/api/admin/categories`);
+                state.categories = response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        onMounted(()=>{
+            getLstcategories();
+        })
+
+        return {
+            ...toRefs(state),
+        }
+    }
+}
 </script>
 

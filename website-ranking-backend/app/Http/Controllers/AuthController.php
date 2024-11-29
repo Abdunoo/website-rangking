@@ -136,6 +136,35 @@ class AuthController extends Controller
         );
     }
 
+    public function loginAsAdmin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Check if user exists and is an admin
+        if (!$user || !Hash::check($request->password, $user->password) || $user->role !== 'admin') {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect or you do not have admin access.'],
+            ]);
+        }
+
+        $token = $user->createToken('auth_token', ['admin'])->plainTextToken;
+        $user->photo = $user->photo ? Storage::url($user->photo) : null;
+
+        return $this->json(
+            200,
+            'Admin login successful.',
+            [
+                'user' => $user,
+                'token' => $token
+            ],
+        );
+    }
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();

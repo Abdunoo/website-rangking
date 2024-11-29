@@ -43,8 +43,8 @@ export default {
   methods: {
     getRankChange(current, previous) {
       const diff = previous - current;
-      if (diff >= 0) return `↑${diff}`
-      return `↓${diff}`;
+      if (diff >= 0) return `↑${Math.abs(diff)}`
+      return `↓${Math.abs(diff)}`;
     }
   }
 }

@@ -158,6 +158,10 @@ export default {
       toast.info('Logout Successfully!')
     };
 
+    onMounted(()=>{
+      dataStore.fetchUserData();
+    })
+
     return {
       dataStore,
       showEditProfileModal,

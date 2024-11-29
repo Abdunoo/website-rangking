@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReviewController;
@@ -9,9 +10,10 @@ use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/admin/login', [AuthController::class, 'loginAsAdmin'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::get('/public/websites', [WebsiteController::class, 'index']);
-Route::get('/public/categories', [CategoryController::class, 'index']);
+Route::get('/public/websites', [WebsiteController::class, 'getLstWebsites']);
+Route::get('/public/categories', [CategoryController::class, 'listCategories']);
 Route::get('/public/websites/{website}', [WebsiteController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -20,7 +22,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/auth/profile/photo', [AuthController::class, 'removeProfilePhoto']);
     Route::post('/change-password', [AuthController::class, 'changePassword'])->name('change.password');
     Route::get('/websiteByName/{website}', [WebsiteController::class, 'byName']);
-    Route::get('/credits', [CreditController::class, 'index']);
     Route::post('/credits/purchase-credits', [CreditController::class, 'addCredits']);
     Route::get('/credits/purchase-history', [CreditController::class, 'getHistoryPayment']);
     Route::post('/credits/deduct', [CreditController::class, 'deductCredits']);
@@ -33,16 +34,29 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
      // Review Routes
-     Route::get('/websites/{websiteId}/reviews', [ReviewController::class, 'index']);
+    //  Route::get('/websites/{websiteId}/reviews', [ReviewController::class, 'index']);
      Route::post('/reviews', [ReviewController::class, 'store']);
      Route::put('/reviews/{reviewId}', [ReviewController::class, 'update']);
      Route::delete('/reviews/{reviewId}', [ReviewController::class, 'destroy']);
      Route::get('/my-reviews', [ReviewController::class, 'userReviews']);
 
+     Route::get('/websites/{websiteId}/review-stats', [ReviewController::class, 'reviewStats']);
+
      // Admin Routes
-     Route::middleware(['can:admin,App\Models\Review'])->group(function () {
-         Route::post('/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
-         Route::get('/websites/{websiteId}/review-stats', [ReviewController::class, 'reviewStats']);
-     });
+    //  Route::middleware(['can:admin,App\Models\Review'])->group(function () {
+    //      Route::post('/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
+    //  });
+
+
+     Route::middleware(['can:admin'])->group(function () {
+        Route::apiResource('/admin/websites', WebsiteController::class);
+        Route::apiResource('/admin/categories', CategoryController::class);
+        Route::apiResource('/admin/credits', CreditController::class);
+        Route::apiResource('/admin/reviews', ReviewController::class);
+        Route::apiResource('/admin/users', UserController::class);
+
+        Route::get('/admin/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
+        Route::get('/admin/credits/{creditId}/approve', [CreditController::class, 'approveCredit']);
+    });
 
 });

@@ -41,6 +41,28 @@ class WebsiteController extends Controller
         );
     }
 
+    public function getLstWebsites(Request $request)
+    {
+        $limit = $request->input('limit', 50);
+        $orderBy = $request->input('order_by', 'rank');
+        $searchTerm = '%' . $request->input('search', '') . '%';
+        $categoryId = $request->input('cat', '');
+
+        $websites = Website::with('categories')
+            ->where('domain', 'LIKE', $searchTerm)
+            ->when($categoryId, function ($query) use ($categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->orderBy($orderBy)
+            ->paginate($limit);
+
+        return $this->json(
+            200,
+            'Websites retrieved successfully.',
+            $websites
+        );
+    }
+
     public function byName($name) {
         $user = Auth::user();
 

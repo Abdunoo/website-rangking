@@ -27,15 +27,15 @@
           </thead>
           <tbody>
             <tr v-for="review in reviews" :key="review.id" class="border-b">
-              <td class="py-3">{{ review.user }}</td>
-              <td class="py-3">{{ review.website }}</td>
-              <td class="py-3">{{ review.content }}</td>
+              <td class="py-3">{{ review.user.name }}</td>
+              <td class="py-3">{{ review.website.name }}</td>
+              <td class="py-3">{{ review.content ?? '-' }}</td>
               <td class="py-3">
                 <span :class="[
                   'badge',
-                  review.status === 'Approved' ? 'badge-success' : 'badge-warning'
+                  review.is_approved === 1 ? 'badge-success' : 'badge-warning'
                 ]">
-                  {{ review.status }}
+                  {{ review.is_approved === 1 ? 'Approved' : 'Pending' }}
                 </span>
               </td>
               <td class="py-3">{{ review.date }}</td>
@@ -47,31 +47,72 @@
           </tbody>
         </table>
       </div>
+      <div class="flex justify-between">
+            <button
+                class="btn btn-secondary"
+                @click="prevPage"
+                :disabled="currentPage === 1">
+                Previous
+            </button>
+            <button
+                class="btn btn-secondary"
+                @click="nextPage"
+                :disabled="reviews.length < itemsPerPage">
+                Next
+            </button>
+        </div>
     </div>
   </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
+import { onMounted, reactive, ref, toRefs } from 'vue';
+import apiClient from '../helpers/axios';
 
-const reviews = ref([
-  {
-    id: 1,
-    user: 'John Doe',
-    website: 'Example.com',
-    content: 'Great website, very informative!',
-    status: 'Approved',
-    date: '2024-03-01'
-  },
-  {
-    id: 2,
-    user: 'Jane Smith',
-    website: 'Sample.com',
-    content: 'The design could be improved.',
-    status: 'Pending',
-    date: '2024-03-02'
-  },
-]);
+export default {
+    setup() {
+        const state = reactive({
+            reviews: [],
+            currentPage: 1,
+            itemsPerPage: 10,
+        });
 
-const filterStatus = ref('all');
+        const getLstReviews = async () => {
+            try {
+                const response = await apiClient.get('/api/admin/reviews', {
+                    params: {
+                        page: state.currentPage,
+                        perPage: state.itemsPerPage
+                    }
+                });
+                state.reviews = response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        const nextPage = () => {
+            state.currentPage++;
+            getLstReviews();
+        };
+
+        const prevPage = () => {
+            if (state.currentPage > 1) {
+                state.currentPage--;
+                getLstReviews();
+            }
+        };
+
+        onMounted(() => {
+            getLstReviews();
+        })
+
+        return {
+            ...toRefs(state),
+            nextPage,
+            prevPage,
+        }
+
+    }
+}
 </script>
 
