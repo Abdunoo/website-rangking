@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             CreditSeeder::class,
             SettingSeeder::class,
             ReviewSeeder::class,
+            WebsiteTrendsSeeder::class,
         ]);
     }
 }

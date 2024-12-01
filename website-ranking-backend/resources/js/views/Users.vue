@@ -32,6 +32,20 @@
                 </tbody>
             </table>
         </div>
+        <div class="flex justify-between">
+            <button
+                class="btn btn-secondary"
+                @click="prevPage"
+                :disabled="currentPage === 1">
+                Previous
+            </button>
+            <button
+                class="btn btn-secondary"
+                @click="nextPage"
+                :disabled="users.length < itemsPerPage">
+                Next
+            </button>
+        </div>
     </div>
 </template>
 
@@ -43,16 +57,35 @@ export default {
     setup() {
         const state = reactive({
             users: [],
+            currentPage: 1,
+            itemsPerPage: 10,
         });
 
         const getLstUsers = async () => {
             try {
-                const response = await apiClient.get('/api/admin/users');
-                state.users = response.data;
+                const response = await apiClient.get('/api/admin/users', {
+                    params: {
+                        page: state.currentPage,
+                        limit: state.itemsPerPage
+                    }
+                });
+                state.users = response.data.data;
             } catch (error) {
                 console.error(error);
             }
         }
+
+        const nextPage = () => {
+            state.currentPage++;
+            getLstUsers();
+        };
+
+        const prevPage = () => {
+            if (state.currentPage > 1) {
+                state.currentPage--;
+                getLstUsers();
+            }
+        };
 
         onMounted(() => {
             getLstUsers();
@@ -60,6 +93,8 @@ export default {
 
         return {
             ...toRefs(state),
+            nextPage,
+            prevPage,
         }
 
     }

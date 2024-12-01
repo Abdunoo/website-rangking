@@ -18,9 +18,10 @@ class CreditController extends Controller
 
     public function index(Request $request)
     {
+        $limit = $request->input('limit', 10);
         $oneMonthAgo = Carbon::now()->subMonth();
 
-        $credits = Credit::with('user')->orderByDesc('created_at')->get();
+        $credits = Credit::with('user')->orderByDesc('id')->paginate($limit);
 
         $activeUsers = Credit::where('created_at', '>=', $oneMonthAgo)
             ->distinct('user_id')

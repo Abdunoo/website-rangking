@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
 use App\Models\Website;
+use App\Models\WebsiteTrends;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,6 +96,11 @@ class WebsiteController extends Controller
                 ? Storage::url($photoPath)
                 : $photoPath;
         }
+
+        $website_trends = WebsiteTrends::create([
+            'user_id' => $user->id,
+            'website_id' => $website->id,
+        ]);
 
         return $this->json(
             200,

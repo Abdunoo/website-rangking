@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
@@ -49,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
      Route::middleware(['can:admin'])->group(function () {
+        Route::get('/admin/website-rankings', [AdminController::class, 'getWebsiteRankings']);
+        Route::get('/admin/stats', [AdminController::class, 'getStats']);
+
         Route::apiResource('/admin/websites', WebsiteController::class);
         Route::apiResource('/admin/categories', CategoryController::class);
         Route::apiResource('/admin/credits', CreditController::class);

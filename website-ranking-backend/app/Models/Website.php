@@ -28,4 +28,9 @@ class Website extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function WebsiteTrends()
+    {
+        return $this->hasMany(WebsiteTrends::class);
+    }
+
 }

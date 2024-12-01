@@ -16,9 +16,11 @@ class UserController extends Controller
     use AuthorizesRequests;
 
     // Method to display a list of users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $limit = $request->input('limit', 10);
+
+        $users = User::orderByDesc('id')->paginate($limit);
         return $this->json(
             200,
             'Users retrieved successfully',

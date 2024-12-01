@@ -82,6 +82,20 @@
                 </tbody>
             </table>
         </div>
+        <div class="flex justify-between">
+            <button
+                class="btn btn-secondary"
+                @click="prevPage"
+                :disabled="currentPage === 1">
+                Previous
+            </button>
+            <button
+                class="btn btn-secondary"
+                @click="nextPage"
+                :disabled="credits.length < itemsPerPage">
+                Next
+            </button>
+        </div>
     </div>
 </template>
 
@@ -98,12 +112,19 @@ export default {
             activeUsers: 0,
             showMenu: false,
             activeMenuId: null,
+            currentPage: 1,
+            itemsPerPage: 10,
         });
 
         const getLstCredits = async () => {
             try {
-                const response = await apiClient.get('/api/admin/credits');
-                state.credits = response.data.credits;
+                const response = await apiClient.get('/api/admin/credits',{
+                    params: {
+                        page: state.currentPage,
+                        limit: state.itemsPerPage,
+                    }
+                });
+                state.credits = response.data.credits.data;
                 state.totalCredits = response.data.totalCredits;
                 state.activeUsers = response.data.activeUsers;
                 state.pendingTransactions = response.data.pendingTransactions;
@@ -121,6 +142,7 @@ export default {
                 const response = await apiClient.get(`/api/admin/credits/${creditId}/approve`);
                 if (response.code === 200) {
                     state.credits = state.credits.map(credit => credit.id === creditId ? response.data : credit);
+                    getLstCredits();
                 }
             } catch (error) {
                 console.error(error);
@@ -133,6 +155,18 @@ export default {
             state.activeMenuId = null; // Hide the menu after action
         }
 
+        const nextPage = () => {
+            state.currentPage++;
+            getLstCredits();
+        };
+
+        const prevPage = () => {
+            if (state.currentPage > 1) {
+                state.currentPage--;
+                getLstCredits();
+            }
+        };
+
         onMounted(() => {
             getLstCredits();
         })
@@ -142,6 +176,8 @@ export default {
             toggleMenu,
             approveCredit,
             rejectCredit,
+            nextPage,
+            prevPage,
         }
 
     }

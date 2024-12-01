@@ -81,7 +81,7 @@ export default {
                 const response = await apiClient.get('/api/admin/reviews', {
                     params: {
                         page: state.currentPage,
-                        perPage: state.itemsPerPage
+                        limit: state.itemsPerPage
                     }
                 });
                 state.reviews = response.data.data;
