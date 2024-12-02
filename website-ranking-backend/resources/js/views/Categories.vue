@@ -21,6 +21,7 @@
 <script>
 import { onMounted, reactive, ref, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
+import { useDataStore } from '../store/dataStore';
 
 export default {
     name: 'Categories',
@@ -30,13 +31,17 @@ export default {
 
         })
 
+        const dataStore = useDataStore();
+
         const getLstcategories = async () => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get(`/api/admin/categories`);
                 state.categories = response.data.data;
             } catch (error) {
                 console.error(error);
             }
+            dataStore.setLoading(false);
         };
 
         onMounted(()=>{

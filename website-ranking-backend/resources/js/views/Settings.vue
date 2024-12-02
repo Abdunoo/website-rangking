@@ -4,7 +4,7 @@
 
     <div class="card">
       <h2 class="text-xl font-semibold mb-4">General Settings</h2>
-      
+
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -40,8 +40,9 @@
           </div>
         </div>
 
-        <div class="pt-4">
+        <div class="pt-4 flex justify-between items-center">
           <button class="btn btn-primary">Save Changes</button>
+          <button class="btn text-white bg-red-600">Logout</button>
         </div>
       </div>
     </div>

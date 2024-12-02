@@ -102,6 +102,7 @@
 <script>
 import { onMounted, reactive, ref, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
+import { useDataStore } from '../store/dataStore';
 
 export default {
     setup() {
@@ -116,7 +117,10 @@ export default {
             itemsPerPage: 10,
         });
 
+        const dataStore = useDataStore();
+
         const getLstCredits = async () => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get('/api/admin/credits',{
                     params: {
@@ -131,6 +135,7 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+            dataStore.setLoading(false);
         }
 
         const toggleMenu = (creditId) => {
@@ -138,6 +143,7 @@ export default {
         }
 
         const approveCredit = async(creditId) => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get(`/api/admin/credits/${creditId}/approve`);
                 if (response.code === 200) {
@@ -148,6 +154,7 @@ export default {
                 console.error(error);
             }
             state.activeMenuId = null;
+            dataStore.setLoading(false);
         }
         const rejectCredit = (creditId) => {
             // Logic to reject the credit

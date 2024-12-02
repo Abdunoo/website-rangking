@@ -55,6 +55,8 @@
 <script>
 import { onMounted, reactive, ref, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
+import { useToast } from 'vue-toastification';
+import { useDataStore } from '../store/dataStore';
 
 export default {
     name: 'Websites',
@@ -64,8 +66,10 @@ export default {
             currentPage: 1,
             itemsPerPage: 10,
         });
+        const dataStore = useDataStore();
 
         const getLstRanking = async () => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get(`/api/admin/websites?page=${state.currentPage}&limit=${state.itemsPerPage}`);
                 state.rankings = response.data.data;
@@ -73,6 +77,7 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+            dataStore.setLoading(false);
         };
 
         const nextPage = () => {

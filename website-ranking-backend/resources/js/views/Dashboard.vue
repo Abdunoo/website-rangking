@@ -32,6 +32,7 @@ import {
     Tooltip,
     Legend
 } from 'chart.js';
+import { useDataStore } from '../store/dataStore';
 
 ChartJS.register(
     CategoryScale,
@@ -46,6 +47,7 @@ ChartJS.register(
 export default {
     components: { Line },
     setup() {
+        const dataStore = useDataStore();
         // Reactive chart data and options
         const chartData = ref({
             labels: [],
@@ -109,15 +111,18 @@ export default {
         ]);
 
         const fetchDataState = async () => {
+            dataStore.setLoading(true);
             try {
                 const statsResponse = await apiClient.get('/api/admin/stats');
                 stats.value = statsResponse.data;
             } catch (error) {
                 console.error('Error fetching stats data:', error);
             }
+            dataStore.setLoading(false);
         };
 
         const fetchData = async () => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get('/api/admin/website-rankings');
                 const rankingsData = response.data;
@@ -146,6 +151,7 @@ export default {
             } catch (error) {
                 console.error('Error fetching chart data:', error);
             }
+            dataStore.setLoading(false);
         };
 
         onMounted(() => {

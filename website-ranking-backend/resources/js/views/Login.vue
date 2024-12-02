@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
+  <div class="max-w-md flex flex-col items-center mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
 
-    <form @submit.prevent="handleLogin" class="space-y-4">
+    <form @submit.prevent="handleLogin" class="space-y-4 flex flex-col items-center">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Email
@@ -31,7 +31,7 @@
         {{ errorMessage }}
       </div>
 
-      <button type="submit" fullWidth>Login</button>
+      <button class="btn btn-primary" type="submit" fullWidth>Login</button>
     </form>
 
     <div class="mt-4 text-center">
@@ -49,6 +49,7 @@
 import { reactive, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '../helpers/axios';
+import { useDataStore } from '../store/dataStore';
 // import Button from '@/components/ui/Button.vue'
 // import apiClient from '@/helpers/axios';
 // import { useDataStore } from '@/store/dataStore.js';
@@ -65,23 +66,21 @@ export default {
     })
 
     const router = useRouter()
-    // const dataStore = useDataStore();
+    const dataStore = useDataStore();
 
     const handleLogin = async () => {
+        dataStore.setLoading(true);
       try {
         if (!state.email || !state.password) {
           errorMessage.value = 'Please fill in all fields'
           return
         }
-
         const response = await apiClient.post('/api/admin/login', {
           email: state.email,
           password: state.password
         })
 
         if (response.code === 200) {
-        //   dataStore.updateCredits(response.data.user.credits);
-        //   if (response.data.user.photo) dataStore.updatePhotoProfile(response.data.user.photo);
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('_usr', JSON.stringify(response.data.user));
           router.push('/')
@@ -91,6 +90,7 @@ export default {
       } catch (error) {
         state.errorMessage = 'Login failed. Please try again.'
       }
+      dataStore.setLoading(false);
     }
 
     return {

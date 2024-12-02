@@ -52,6 +52,7 @@
 <script>
 import { onMounted, reactive, ref, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
+import { useDataStore } from '../store/dataStore';
 
 export default {
     setup() {
@@ -61,7 +62,10 @@ export default {
             itemsPerPage: 10,
         });
 
+        const dataStore = useDataStore();
+
         const getLstUsers = async () => {
+            dataStore.setLoading(true);
             try {
                 const response = await apiClient.get('/api/admin/users', {
                     params: {
@@ -73,6 +77,7 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+            dataStore.setLoading(false);
         }
 
         const nextPage = () => {

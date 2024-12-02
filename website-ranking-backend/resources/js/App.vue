@@ -3,8 +3,11 @@ import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
+import LoadingIndicator from './components/LoadingIndicator.vue';
+import { useDataStore } from './store/dataStore';
 
 const isSidebarOpen = ref(true);
+const dataStore = useDataStore();
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -19,6 +22,7 @@ const toggleSidebar = () => {
       <main class="p-6">
         <RouterView />
       </main>
+      <LoadingIndicator v-if="dataStore.loading" />
     </div>
   </div>
 </template>
