@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
 use App\Models\Contact;
+use App\Models\Review;
 use App\Models\Website;
 use App\Models\WebsiteTrends;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -17,6 +18,54 @@ class WebsiteController extends Controller
 {
     use ApplicationResponse;
     use AuthorizesRequests;
+
+    protected $reviewController;
+
+    public function __construct(ReviewController $reviewController)
+    {
+        $this->reviewController = $reviewController;
+    }
+
+    public function updateRankings(Request $request)
+    {
+        try {
+            $this->reviewController->updateAllWebsiteRatings();
+
+            $websites = Website::with(['reviews' => function ($query) {
+                $query->where('is_approved', true);
+            }, 'websiteTrends'])->get();
+
+            foreach ($websites as $website) {
+                $averageRating = $website->reviews->avg('rating');
+                $trendsCount = $website->websiteTrends->count();
+                $website['score'] = $this->calculateScore($averageRating, $trendsCount);
+            }
+
+            $websites = $websites->sortByDesc('score')->values();
+
+            $rank = 1;
+            foreach ($websites as $website) {
+                $website->previous_rank = $website->rank;
+                $website->rank = $rank;
+                $website->save(['rank', 'previous_rank']);
+                $rank++;
+            }
+
+            return $this->json(200, 'Rankings updated successfully.');
+        } catch (\Exception $e) {
+            return $this->json(500, 'Error updating rankings: ' . $e->getMessage());
+        }
+    }
+
+    private function calculateScore($averageRating, $trendsCount)
+    {
+        $ratingWeight = config('rankings.rating_weight', 0.7);
+        $trendsWeight = config('rankings.trends_weight', 0.3);
+
+        $normalizedRating = $averageRating ? $averageRating * 20 : 0;
+
+        return ($normalizedRating * $ratingWeight) + ($trendsCount * $trendsWeight);
+    }
 
     /**
      * Display a listing of websites.

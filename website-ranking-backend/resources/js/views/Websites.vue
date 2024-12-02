@@ -88,8 +88,10 @@
             </div>
         </transition>
         <transition name="fade">
-            <div v-if="isDeleteModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
-                <div @click="isDeleteModalVisible = !isDeleteModalVisible" class="fixed bg-black opacity-70 inset-0 z-0"></div>
+            <div v-if="isDeleteModalVisible"
+                class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
+                <div @click="isDeleteModalVisible = !isDeleteModalVisible"
+                    class="fixed bg-black opacity-70 inset-0 z-0"></div>
                 <div
                     class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
                     <div>
@@ -217,6 +219,7 @@ export default {
                 await fetchWebsites();
                 closeModal();
             } catch (error) {
+                toast.error(error.response.data.message)
                 console.error(error);
             } finally {
                 dataStore.setLoading(false);
@@ -241,6 +244,7 @@ export default {
                 toast.success('Website deleted successfully');
                 closeDeleteModal();
             } catch (error) {
+                toast.error(error.response.data.message);
                 console.error(error);
             } finally {
                 dataStore.setLoading(false);

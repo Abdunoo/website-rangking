@@ -34,22 +34,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/categories', CategoryController::class);
 
 
-     // Review Routes
+    // Review Routes
     //  Route::get('/websites/{websiteId}/reviews', [ReviewController::class, 'index']);
-     Route::post('/reviews', [ReviewController::class, 'store']);
-     Route::put('/reviews/{reviewId}', [ReviewController::class, 'update']);
-     Route::delete('/reviews/{reviewId}', [ReviewController::class, 'destroy']);
-     Route::get('/my-reviews', [ReviewController::class, 'userReviews']);
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::put('/reviews/{reviewId}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{reviewId}', [ReviewController::class, 'destroy']);
+    Route::get('/my-reviews', [ReviewController::class, 'userReviews']);
 
-     Route::get('/websites/{websiteId}/review-stats', [ReviewController::class, 'reviewStats']);
+    Route::get('/websites/{websiteId}/review-stats', [ReviewController::class, 'reviewStats']);
 
-     // Admin Routes
+    // Admin Routes
     //  Route::middleware(['can:admin,App\Models\Review'])->group(function () {
     //      Route::post('/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
     //  });
 
 
-     Route::middleware(['can:admin'])->group(function () {
+    Route::middleware(['can:admin'])->group(function () {
+        Route::get('/admin/websites/update-rankings', [WebsiteController::class, 'updateRankings']);
+
         Route::get('/admin/website-rankings', [AdminController::class, 'getWebsiteRankings']);
         Route::get('/admin/stats', [AdminController::class, 'getStats']);
 
@@ -59,8 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/admin/reviews', ReviewController::class);
         Route::apiResource('/admin/users', UserController::class);
 
+        Route::get('/admin/reviews/update-all-website-ratings', [ReviewController::class, 'updateAllWebsiteRatings']);
         Route::get('/admin/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
+        Route::get('/admin/reviews/{reviewId}/reject', [ReviewController::class, 'rejectReview']);
         Route::get('/admin/credits/{creditId}/approve', [CreditController::class, 'approveCredit']);
-    });
 
+    });
 });

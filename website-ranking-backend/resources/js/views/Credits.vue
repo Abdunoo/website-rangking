@@ -103,6 +103,7 @@
 import { onMounted, reactive, ref, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
 import { useDataStore } from '../store/dataStore';
+import { useToast } from 'vue-toastification';
 
 export default {
     setup() {
@@ -118,6 +119,7 @@ export default {
         });
 
         const dataStore = useDataStore();
+        const toast = useToast();
 
         const getLstCredits = async () => {
             dataStore.setLoading(true);
@@ -148,6 +150,7 @@ export default {
                 const response = await apiClient.get(`/api/admin/credits/${creditId}/approve`);
                 if (response.code === 200) {
                     state.credits = state.credits.map(credit => credit.id === creditId ? response.data : credit);
+                    toast.success('Credit approved successfully');
                     getLstCredits();
                 }
             } catch (error) {

@@ -73,6 +73,27 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * Update the average rating for all websites
+     */
+    public function updateAllWebsiteRatings()
+    {
+        $websites = Website::all();
+
+        foreach ($websites as $website) {
+            $approvedReviews = Review::where('website_id', $website->id)
+                ->where('is_approved', true)
+                ->get();
+
+            $averageRating = $approvedReviews->avg('rating');
+
+            $website->rating = round($averageRating, 2);
+            $website->save();
+        }
+
+         return $this->json(200, 'All website ratings updated successfully.');
+    }
+
     public function approveReview($reviewId)
     {
         $review = Review::find($reviewId);
@@ -108,6 +129,40 @@ class ReviewController extends Controller
         );
     }
 
+    public function rejectReview($reviewId)
+    {
+        $review = Review::find($reviewId);
+
+        if (!$review) {
+            return $this->json(404, 'Review not found.');
+        }
+
+        if ($review->is_approved === false) {
+            return $this->json(400, 'Review is already rejected.');
+        }
+
+        $review->is_approved = false;
+        $review->save();
+
+        $website = Website::find($review->website_id);
+        if (!$website) {
+            return $this->json(404, 'Website not found.');
+        }
+
+        $approvedReviews = Review::where('website_id', $website->id)
+            ->where('is_approved', true)
+            ->get();
+
+        $averageRating = $approvedReviews->avg('rating');
+        $website->rating = round($averageRating, 2);
+        $website->save();
+
+        return $this->json(
+            200,
+            'Review rejected and website rating updated successfully.',
+            $review
+        );
+    }
 
     /**
      * Update an existing review
