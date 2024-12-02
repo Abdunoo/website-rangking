@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApplicationResponse;
+use App\Models\Contact;
 use App\Models\Website;
 use App\Models\WebsiteTrends;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -27,7 +28,7 @@ class WebsiteController extends Controller
         $searchTerm = '%' . $request->input('search', '') . '%';
         $categoryId = $request->input('cat', '');
 
-        $websites = Website::with('categories')
+        $websites = Website::with('categories', 'contacts')
             ->where('domain', 'LIKE', $searchTerm)
             ->when($categoryId, function ($query) use ($categoryId) {
                 return $query->where('category_id', $categoryId);
@@ -127,6 +128,35 @@ class WebsiteController extends Controller
 
         $website = Website::create(array_merge($request->all(), ['rank' => $newRank, 'previous_rank' => $newRank]));
 
+        $user = Auth::user();
+
+        if (!empty($request->input('email'))) {
+            $contactEmail = Contact::create(
+                [
+                    'type' => 'email',
+                    'value' => $request->input('email'),
+                    'website_id' => $website->id,
+                    'user_id' => $user->id,
+                ]
+            );
+        }
+
+        if (!empty($request->input('phone'))) {
+            $contactPhone = Contact::create(
+                [
+                    'type' => 'phone',
+                    'value' => $request->input('phone'),
+                    'website_id' => $website->id,
+                    'user_id' => $user->id,
+                ]
+            );
+        }
+
+        $website->contacts = [
+            $contactEmail,
+            $contactPhone
+        ];
+
         return $this->json(
             200,
             'Website created successfully.',
@@ -141,10 +171,18 @@ class WebsiteController extends Controller
     {
         $request->validate([
             'domain' => 'required|string|max:255|unique:websites,domain,' . $website->id,
-            'rank' => 'required|integer',
         ]);
 
         $website->update($request->all());
+
+        $contactEmail = Contact::where('website_id', $website->id)->where('type', 'email')->first();
+        if ($contactEmail) {
+            $contactEmail->update(['value' => $request->input('email')]);
+        }
+        $contactPhone = Contact::where('website_id', $website->id)->where('type', 'phone')->first();
+        if ($contactPhone) {
+            $contactPhone->update(['value' => $request->input('phone')]);
+        }
 
         return $this->json(
             200,

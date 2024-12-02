@@ -1,150 +1,95 @@
 <template>
-    <div class="">
-        <div class="space-y-6">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Websites</h1>
-                <button @click="showAddModal" class="btn btn-primary">Add Website</button>
-            </div>
-
-            <div class="card">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left py-3">Name</th>
-                            <th class="text-left py-3">Domain</th>
-                            <th class="text-left py-3">Category</th>
-                            <th class="text-left py-3">Rank</th>
-                            <th class="text-left py-3">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="website in websites" :key="website.id" class="border-b">
-                            <td class="py-3">{{ website.name }}</td>
-                            <td class="py-3">{{ website.domain }}</td>
-                            <td class="py-3">{{ website.categories.name }}</td>
-                            <td class="py-3">#{{ website.rank }}</td>
-                            <td class="py-3">
-                                <button @click="showEditModal(website)"
-                                    class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
-                                <button @click="showDeleteModal(website)"
-                                    class="text-red-600 hover:text-red-800">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-between">
-                <button class="btn btn-secondary" @click="prevPage" :disabled="currentPage === 1">
-                    Previous
-                </button>
-                <button class="btn btn-secondary" @click="nextPage" :disabled="websites.length < itemsPerPage">
-                    Next
-                </button>
-            </div>
+    <div class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Websites</h1>
+            <button @click="openModal()" class="btn btn-primary">Add Website</button>
         </div>
 
-        <!-- Add Website Modal -->
+        <div class="card">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b">
+                        <th class="text-left py-3">Name</th>
+                        <th class="text-left py-3">Domain</th>
+                        <th class="text-left py-3">Category</th>
+                        <th class="text-left py-3">Rank</th>
+                        <th class="text-left py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="website in websites" :key="website.id" class="border-b">
+                        <td class="py-3">{{ website.name }}</td>
+                        <td class="py-3">{{ website.domain }}</td>
+                        <td class="py-3">{{ website.categories.name }}</td>
+                        <td class="py-3">#{{ website.rank }}</td>
+                        <td class="py-3">
+                            <button @click="openModal(website)"
+                                class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                            <button @click="confirmDelete(website)"
+                                class="text-red-600 hover:text-red-800">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-between">
+            <button class="btn btn-secondary" @click="prevPage" :disabled="currentPage === 1">Previous</button>
+            <button class="btn btn-secondary" @click="nextPage" :disabled="websites.length < itemsPerPage">Next</button>
+        </div>
+
+        <!-- Combined Add/Edit Modal -->
         <transition name="fade">
-            <div v-if="isAddModalVisible"
-                class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
-                <div @click="isAddModalVisible = !isAddModalVisible" class="fixed bg-black opacity-70 inset-0 z-0">
-                </div>
+            <div v-if="isModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
+                <div @click="closeModal" class="fixed bg-black opacity-70 inset-0 z-0"></div>
                 <div
                     class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
-                    <form @submit.prevent="addWebsite" class="w-full">
+                    <form @submit.prevent="saveWebsite" class="w-full">
                         <div class="p-3 flex-auto leading-6">
-                            <h2 class="text-center text-lg font-bold">Add New Website</h2>
+                            <h2 class="text-center text-lg font-bold">{{ selectedWebsite ? 'Edit Website' : 'Add New Website' }}</h2>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Name
-                                </label>
-                                <input v-model="newWebsite.name" type="text" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <input v-model="websiteForm.name" type="text" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Domain
-                                </label>
-                                <input v-model="newWebsite.domain" type="text" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Domain</label>
+                                <input v-model="websiteForm.domain" type="text" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Category
-                                </label>
-                                <select v-model="newWebsite.category_id"
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                <select v-model="websiteForm.category_id"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
                                     <option selected value="">Select category</option>
                                     <option v-for="category in categories" :value="category.id">{{ category.name }}
                                     </option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="p-3 mt-2 text -center space-x-4 md:block">
-                            <button type="submit" class="mb-2 md:mb-0 btn btn-primary">
-                                Add Website
-                            </button>
-                            <button type="reset" @click="cancelAddWebsite()" class="mb-2 md:mb-0 btn btn-danger">
-                                Close
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </transition>
-
-        <!-- Existing Edit Modal -->
-        <transition name="fade">
-            <div v-if="isModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
-                <div @click="isModalVisible = !isModalVisible" class="fixed bg-black opacity-70 inset-0 z-0"></div>
-                <div
-                    class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
-                    <form @submit.prevent="updateWebsite" class="w-full">
-                        <div class="p-3 flex-auto leading-6">
-                            <h2 class="text-center text-lg font-bold">Edit Website</h2>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Name
-                                </label>
-                                <input v-model="selectedWebsite.name" type="text" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input v-model="websiteForm.email" type="email" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Domain
-                                </label>
-                                <input v-model="selectedWebsite.domain" type="text" required
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                <input v-model="websiteForm.phone" type="tel" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Category
-                                </label>
-                                <select v-model="selectedWebsite.category_id"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none
-                                    focus:ring-2 focus:ring-primary">
-                                    <option selected value="">Select category</option>
-                                    <option v-for="category in categories" :value="category.id">{{ category.name }}
-                                    </option>
-                                </select>
-                            </div>
                         </div>
-                        <div class="p-3 mt-2 text-center space-x-4 md:block">
-                            <button type="submit" class="mb-2 md:mb-0 btn btn-primary">
-                                Save
+                        <div class="p-3 mt-2 text-center space-x-4">
+                            <button type="submit" class="mb-2 btn btn-primary">
+                                {{ selectedWebsite ? 'Save' : 'Add Website' }}
                             </button>
-                            <button type="reset" @click="cancelEditWebsite()" class="mb-2 md:mb-0 btn btn-danger">
-                                Close
-                            </button>
+                            <button type="button" @click="closeModal" class="mb-2 btn btn-danger">Close</button>
                         </div>
                     </form>
                 </div>
             </div>
         </transition>
         <transition name="fade">
-            <div v-if="isModalVisible2" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
-                <div @click="isModalVisible2 = !isModalVisible2" class="fixed bg-black opacity-70 inset-0 z-0"></div>
+            <div v-if="isDeleteModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
+                <div @click="isDeleteModalVisible = !isDeleteModalVisible" class="fixed bg-black opacity-70 inset-0 z-0"></div>
                 <div
                     class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
                     <div>
@@ -166,7 +111,7 @@
                             <button @click="deleteWebsite" class="mb-2 md:mb-0 btn btn-danger">
                                 Delete
                             </button>
-                            <button @click="cancelDeleteWebsite" class="mb-2 md:mb-0 btn btn-secondary">
+                            <button @click="closeDeleteModal" class="mb-2 md:mb-0 btn btn-secondary">
                                 Close
                             </button>
                         </div>
@@ -178,7 +123,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref, toRefs } from 'vue';
+import { onMounted, reactive, toRefs } from 'vue';
 import apiClient from '../helpers/axios';
 import { useDataStore } from '../store/dataStore';
 import { useToast } from 'vue-toastification';
@@ -192,103 +137,100 @@ export default {
             currentPage: 1,
             itemsPerPage: 10,
             isModalVisible: false,
-            isModalVisible2: false,
-            isAddModalVisible: false,
+            isDeleteModalVisible: false,
             selectedWebsite: null,
-            newWebsite: {
+            websiteForm: {
                 name: '',
                 domain: '',
-                category_id: ''
+                category_id: '',
+                email: '',
+                phone: ''
             }
         });
 
         const dataStore = useDataStore();
         const toast = useToast();
 
-        const getLstWebsites = async () => {
+        const fetchWebsites = async () => {
             dataStore.setLoading(true);
             try {
-                const response = await apiClient.get(`/api/admin/websites`, {
-                    params: {
-                        page: state.currentPage,
-                        limit: state.itemsPerPage
-                    }
+                const response = await apiClient.get('/api/admin/websites', {
+                    params: { page: state.currentPage, limit: state.itemsPerPage }
                 });
                 state.websites = response.data.data;
             } catch (error) {
                 console.error(error);
+            } finally {
+                dataStore.setLoading(false);
             }
-            dataStore.setLoading(false);
         };
 
-        const getCategories = async () => {
+        const fetchCategories = async () => {
             dataStore.setLoading(true);
             try {
                 const response = await apiClient.get('/api/admin/categories');
                 state.categories = response.data.data;
             } catch (error) {
                 console.error(error);
+            } finally {
+                dataStore.setLoading(false);
             }
-            dataStore.setLoading(false);
         };
 
-        const showAddModal = () => {
-            state.isAddModalVisible = true;
-        }
-
-        const cancelAddWebsite = () => {
-            state.isAddModalVisible = false;
-            state.newWebsite = { name: '', domain: '', category_id: '' };
-        }
-
-        const addWebsite = async () => {
-            dataStore.setLoading(true);
-            try {
-                const response = await apiClient.post('/api/admin/websites', state.newWebsite);
-                if (response.code === 200) {
-                    toast.success('Website added successfully');
-                    getLstWebsites();
-                    cancelAddWebsite();
-                }
-            } catch (error) {
-                console.error(error);
+        const openModal = (website = null) => {
+            state.selectedWebsite = website ? { ...website } : null;
+            if (website) {
+                state.websiteForm = {
+                    name: website.name,
+                    domain: website.domain,
+                    category_id: website.category_id,
+                    email: website.contacts.find(contact => contact.type === 'email')?.value || '',
+                    phone: website.contacts.find(contact => contact.type === 'phone')?.value || ''
+                };
+            } else {
+                state.websiteForm = { name: '', domain: '', category_id: '', email: '', phone: '' };
             }
-            dataStore.setLoading(false);
-        };
-
-        const showEditModal = (website) => {
             state.isModalVisible = true;
-            state.selectedWebsite = website;
-        }
+        };
 
-        const showDeleteModal = (website) => {
-            state.isModalVisible2 = true;
-            state.selectedWebsite = website;
-        }
-
-        const cancelEditWebsite = () => {
+        const closeModal = () => {
             state.isModalVisible = false;
             state.selectedWebsite = null;
-        }
+        };
 
-        const cancelDeleteWebsite = () => {
-            state.isModalVisible2 = false;
-            state.selectedWebsite = null;
-        }
-
-        const updateWebsite = async () => {
+        const saveWebsite = async () => {
             dataStore.setLoading(true);
             try {
-                const response = await apiClient.put(`/api/admin/websites/${state.selectedWebsite.id}`, state.selectedWebsite);
-                if (response.code === 200) {
-                    toast.success('Website updated successfully');
-                    getLstWebsites();
-                    cancelEditWebsite();
+                if (state.selectedWebsite) {
+                    // Update existing website
+                    const response = await apiClient.put(`/api/admin/websites/${state.selectedWebsite.id}`, state.websiteForm);
+                    if (response.code === 200) {
+                        toast.success('Website updated successfully');
+                    }
+                } else {
+                    // Add new website
+                    const response = await apiClient.post('/api/admin/websites', state.websiteForm);
+                    if (response.code === 200) {
+                        toast.success('Website added successfully');
+                    }
                 }
+                await fetchWebsites();
+                closeModal();
             } catch (error) {
                 console.error(error);
+            } finally {
+                dataStore.setLoading(false);
             }
-            dataStore.setLoading(false);
+        };
+
+        const confirmDelete = (website) => {
+            state.selectedWebsite = website;
+            state.isDeleteModalVisible = true;
+        };
+
+        const closeDeleteModal = () => {
+            state.isDeleteModalVisible = false;
+            state.selectedWebsite = null;
         };
 
         const deleteWebsite = async () => {
@@ -296,49 +238,46 @@ export default {
             try {
                 await apiClient.delete(`/api/admin/websites/${state.selectedWebsite.id}`);
                 state.websites = state.websites.filter((website) => website.id !== state.selectedWebsite.id);
-                state.isModalVisible2 = false;
-                state.selectedWebsite = {};
+                toast.success('Website deleted successfully');
+                closeDeleteModal();
             } catch (error) {
                 console.error(error);
+            } finally {
+                dataStore.setLoading(false);
             }
-            dataStore.setLoading(false);
         };
 
         const nextPage = () => {
             state.currentPage++;
-            getLstWebsites();
+            fetchWebsites();
         };
 
         const prevPage = () => {
             if (state.currentPage > 1) {
                 state.currentPage--;
-                getLstWebsites();
+                fetchWebsites();
             }
         };
 
         onMounted(() => {
-            getLstWebsites();
-            getCategories();
+            fetchWebsites();
+            fetchCategories();
         });
 
         return {
             ...toRefs(state),
-            nextPage,
-            prevPage,
-            showAddModal,
-            cancelAddWebsite,
-            addWebsite,
-            showEditModal,
-            showDeleteModal,
-            cancelEditWebsite,
-            cancelDeleteWebsite,
-            updateWebsite,
+            openModal,
+            closeModal,
+            saveWebsite,
+            confirmDelete,
+            closeDeleteModal,
             deleteWebsite,
+            nextPage,
+            prevPage
         };
     },
 };
 </script>
-
 <style>
 .fade-enter,
 .fade-leave-to {
