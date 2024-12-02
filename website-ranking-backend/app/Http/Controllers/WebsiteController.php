@@ -64,7 +64,8 @@ class WebsiteController extends Controller
         );
     }
 
-    public function byName($name) {
+    public function byName($name)
+    {
         $user = Auth::user();
 
         $website = Website::with([
@@ -74,8 +75,8 @@ class WebsiteController extends Controller
             },
             'reviews.user'
         ])
-        ->where('name', $name)
-        ->first();
+            ->where('name', $name)
+            ->first();
 
         if (!$website) {
             return $this->json(
@@ -115,11 +116,16 @@ class WebsiteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'name' => 'required',
+            'category_id' => 'required',
             'domain' => 'required|string|max:255|unique:websites',
-            'rank' => 'required|integer',
         ]);
 
-        $website = Website::create($request->all());
+        $latestRank = Website::max('rank');
+
+        $newRank = $latestRank ? $latestRank + 1 : 1;
+
+        $website = Website::create(array_merge($request->all(), ['rank' => $newRank, 'previous_rank' => $newRank]));
 
         return $this->json(
             200,
