@@ -91,7 +91,29 @@ class ReviewController extends Controller
             $website->save();
         }
 
-         return $this->json(200, 'All website ratings updated successfully.');
+        return $this->json(200, 'All website ratings updated successfully.');
+    }
+
+    public function updateAllReview(Request $requesr)
+    {
+        try {
+            $status = $requesr->input('status') == 'approve' ? 0 : 1;
+            $reviews = Review::where('is_approved', $status)->get();
+            foreach ($reviews as $review) {
+                $review->is_approved = !$status;
+                $review->save();
+            }
+            return $this->json(
+                200,
+                'Reviews updated successfully.'
+            );
+        } catch (\Throwable $th) {
+            // throw $th;
+            return $this->json(
+                500,
+                'Failed to update reviews'
+            );
+        }
     }
 
     public function approveReview($reviewId)

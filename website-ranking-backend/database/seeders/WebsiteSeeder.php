@@ -33,7 +33,7 @@ class WebsiteSeeder extends Seeder
 
             $website = Website::create([
                 'rank' => $rank,
-                'previous_rank' => $rank + rand(-1, 1),
+                'previous_rank' => intval($rank) + rand(-1, 1),
                 'domain' => $domain,
                 'name' => ucfirst(explode('.', $domain)[0]),
                 'rating' => rand(0, 50) / 10,
@@ -44,14 +44,14 @@ class WebsiteSeeder extends Seeder
                 'website_id' => $website->id,
                 'type' => 'email',
                 'value' => 'contact' . $rank . '@' . $domain,
-                'user_id' => rand(1, 2),
+                'user_id' => 1,
             ]);
 
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'phone',
                 'value' => '+123456789' . rand(1000, 9999),
-                'user_id' => rand(1, 2),
+                'user_id' => 1,
             ]);
 
             $websiteCount++;

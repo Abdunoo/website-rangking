@@ -22,7 +22,6 @@ app.use(Toast, {
     showCloseButtonOnHover: false,
     hideProgressBar: true,
     closeButton: "button",
-    icon: "fas fa-rocket",
     rtl: false
 });
 
