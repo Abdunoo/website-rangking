@@ -55,17 +55,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/website-rankings', [AdminController::class, 'getWebsiteRankings']);
         Route::get('/admin/stats', [AdminController::class, 'getStats']);
 
+        Route::get('/admin/users/search', [UserController::class, 'searchUser']);
+
+
         Route::apiResource('/admin/websites', WebsiteController::class);
         Route::apiResource('/admin/categories', CategoryController::class);
         Route::apiResource('/admin/credits', CreditController::class);
         Route::apiResource('/admin/reviews', ReviewController::class);
         Route::apiResource('/admin/users', UserController::class);
 
+
         Route::get('/admin/reviews/update-all-website-ratings', [ReviewController::class, 'updateAllWebsiteRatings']);
         Route::post('/admin/reviews/update-all', [ReviewController::class, 'updateAllReview']);
         Route::get('/admin/reviews/{reviewId}/approve', [ReviewController::class, 'approveReview']);
         Route::get('/admin/reviews/{reviewId}/reject', [ReviewController::class, 'rejectReview']);
         Route::get('/admin/credits/{creditId}/approve', [CreditController::class, 'approveCredit']);
+        Route::post('/admin/credits/add', [CreditController::class, 'addCredit']);
 
     });
 });

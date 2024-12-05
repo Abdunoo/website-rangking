@@ -60,7 +60,7 @@
             <div v-if="isModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
                 <div @click="isModalVisible = false" class="fixed bg-black opacity-70 inset-0 z-0"></div>
                 <div class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
-                    <div>
+                    <div class="flex flex-col justify-center items-center mb-3 w-full">
                         <div class="text-center p-3 flex-auto justify-center leading-6">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 flex items-center text-red-600 mx-auto" viewBox="0 0 24 24" fill="currentColor">
                                 <path fill-rule="evenodd" d="M12 2a1 1 0 011 1v10a1 1 0 01-2 0V3a1 1 0 011-1zm0 16a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
@@ -68,7 +68,7 @@
                             </svg>
                             <h2 class="text-2xl font-bold py-4">Are you sure?</h2>
                             <p class="text-md text-gray-700 px-8">
-                                Do you really want to Update Ranking All Websites?
+                                Do you really want to <span :class="setStatus === 'approve' ? 'text-primary font-bold' : 'text-danger font-bold'">{{ setStatus.toUpperCase() }}</span> All Reviews?
                             </p>
                             <p class="text-md text-red-700 px-8">This may take some time</p>
                         </div>
@@ -148,6 +148,7 @@ export default {
         };
 
         const updateAllReview = async() => {
+            state.isModalVisible = false;
             dataStore.setLoading(true);
             try {
                 const response = await apiClient.post('/api/admin/reviews/update-all', { status : state.setStatus });
@@ -165,8 +166,8 @@ export default {
         }
 
         const showModalUpdate = async(status) => {
+            state.isModalVisible = true;
             state.setStatus = status;
-            await updateAllReview();
         }
 
         const nextPage = () => {

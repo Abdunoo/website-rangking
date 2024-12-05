@@ -26,7 +26,7 @@
                     }" class="px-4 py-2 text-white text-center">
                   {{ payment.status }}
                 </td>
-                <td class="px-4 py-2">${{ payment.amount.toFixed(2) }}</td>
+                <td class="px-4 py-2">{{ payment.amount }} Credits</td>
                 <td class="px-4 py-2">{{ payment.payment_method ?? 'By Admin' }}</td>
               </tr>
             </tbody>

@@ -49,7 +49,7 @@
             <div @click="isModalVisible = !isModalVisible" class="fixed bg-black opacity-70 inset-0 z-0"></div>
             <div
                 class="w-full max-w-lg p-3 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
-                <div>
+                <div class="flex flex-col justify-center items-center mb-3 w-full">
                     <div class="text-center p-3 flex-auto justify-center leading-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 flex items-center text-red-600 mx-auto"
                             viewBox="0 0 24 24" fill="currentColor">

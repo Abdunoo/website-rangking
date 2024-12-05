@@ -28,6 +28,19 @@ class UserController extends Controller
         );
     }
 
+    public function searchUser(Request $request)
+    {
+        $search = '% ' . $request->input('searchTerm') . '%';
+        $users = User::where('name', 'like', $search)
+            ->orWhere('email', 'like', $search)
+            ->get();
+        return $this->json(
+            200,
+            'Users retrieved successfully',
+            $users
+        );
+    }
+
     // Method to store a newly created user
     public function store(Request $request)
     {

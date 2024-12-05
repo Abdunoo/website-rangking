@@ -105,6 +105,31 @@ class CreditController extends Controller
         );
     }
 
+    public function addCredit(Request $request)
+    {
+        $validate = $request->validate(
+                [
+                    'amount' => 'required|integer|min:1',
+                    'userId' => 'required|integer',
+                ]
+            );
+        $user = User::find($validate['userId']);
+
+        if (!$user) {
+            return $this->json(404, 'User not found.', null);
+        }
+
+        $user->increment('credits', $validate['amount']);
+
+        $credit = Credit::create([
+            'amount' => $validate['amount'],
+            'user_id' => $validate['userId'],
+            'type' => DataHelper::PURCHASE,
+            'status' => DataHelper::APPROVED,
+        ]);
+        return $this->json(200, 'Credit added successfully.', $credit);
+    }
+
     public function deductCredits(Request $request)
     {
         $request->validate([

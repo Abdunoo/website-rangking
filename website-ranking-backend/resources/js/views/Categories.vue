@@ -12,8 +12,6 @@
                 <div class="mt-4 flex gap-2">
                     <button class="btn bg-gray-100 hover:bg-gray-200"
                         @click="showEditCategoryModal(category)">Edit</button>
-                    <button class="btn bg-red-100 text-red-600 hover:bg-red-200"
-                        @click="deleteCategory(category.id)">Delete</button>
                 </div>
             </div>
         </div>
@@ -121,18 +119,6 @@ export default {
             dataStore.setLoading(false);
         };
 
-        const deleteCategory = async (id) => {
-            dataStore.setLoading(true);
-            try {
-                await apiClient.delete(`/api/admin/categories/${id}`);
-                state.categories = state.categories.filter(category => category.id !== id);
-                toast.success('Success delete category')
-            } catch (error) {
-                console.error(error);
-            }
-            dataStore.setLoading(false);
-        };
-
         onMounted(() => {
             getLstcategories();
         });
@@ -144,7 +130,6 @@ export default {
             closeModal,
             createCategory,
             updateCategory,
-            deleteCategory
         };
     }
 }
