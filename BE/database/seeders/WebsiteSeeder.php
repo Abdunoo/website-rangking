@@ -10,32 +10,167 @@ class WebsiteSeeder extends Seeder
 {
     public function run()
     {
-        $filePath = storage_path('app/top-1m.csv');
-        $maxWebsites = 150;
+        $websites = [
+            ["rank" => 1, "domain" => "google.com"],
+            ["rank" => 2, "domain" => "microsoft.com"],
+            ["rank" => 3, "domain" => "mail.ru"],
+            ["rank" => 4, "domain" => "facebook.com"],
+            ["rank" => 5, "domain" => "dzen.ru"],
+            ["rank" => 6, "domain" => "apple.com"],
+            ["rank" => 7, "domain" => "root-servers.net"],
+            ["rank" => 8, "domain" => "amazonaws.com"],
+            ["rank" => 9, "domain" => "youtube.com"],
+            ["rank" => 10, "domain" => "googleapis.com"],
+            ["rank" => 11, "domain" => "akamai.net"],
+            ["rank" => 12, "domain" => "a-msedge.net"],
+            ["rank" => 13, "domain" => "twitter.com"],
+            ["rank" => 14, "domain" => "azure.com"],
+            ["rank" => 15, "domain" => "instagram.com"],
+            ["rank" => 16, "domain" => "cloudflare.com"],
+            ["rank" => 17, "domain" => "gstatic.com"],
+            ["rank" => 18, "domain" => "office.com"],
+            ["rank" => 19, "domain" => "akamaiedge.net"],
+            ["rank" => 20, "domain" => "linkedin.com"],
+            ["rank" => 21, "domain" => "live.com"],
+            ["rank" => 22, "domain" => "tiktokcdn.com"],
+            ["rank" => 23, "domain" => "googletagmanager.com"],
+            ["rank" => 24, "domain" => "googlevideo.com"],
+            ["rank" => 25, "domain" => "akadns.net"],
+            ["rank" => 26, "domain" => "doubleclick.net"],
+            ["rank" => 27, "domain" => "amazon.com"],
+            ["rank" => 28, "domain" => "fbcdn.net"],
+            ["rank" => 29, "domain" => "windowsupdate.com"],
+            ["rank" => 30, "domain" => "microsoftonline.com"],
+            ["rank" => 31, "domain" => "googleusercontent.com"],
+            ["rank" => 32, "domain" => "wikipedia.org"],
+            ["rank" => 33, "domain" => "apple-dns.net"],
+            ["rank" => 34, "domain" => "trafficmanager.net"],
+            ["rank" => 35, "domain" => "bing.com"],
+            ["rank" => 36, "domain" => "fastly.net"],
+            ["rank" => 37, "domain" => "wordpress.org"],
+            ["rank" => 38, "domain" => "office.net"],
+            ["rank" => 39, "domain" => "googlesyndication.com"],
+            ["rank" => 40, "domain" => "icloud.com"],
+            ["rank" => 41, "domain" => "sharepoint.com"],
+            ["rank" => 42, "domain" => "t-msedge.net"],
+            ["rank" => 43, "domain" => "github.com"],
+            ["rank" => 44, "domain" => "l-msedge.net"],
+            ["rank" => 45, "domain" => "youtu.be"],
+            ["rank" => 46, "domain" => "gtld-servers.net"],
+            ["rank" => 47, "domain" => "aaplimg.com"],
+            ["rank" => 48, "domain" => "whatsapp.net"],
+            ["rank" => 49, "domain" => "pinterest.com"],
+            ["rank" => 50, "domain" => "netflix.com"],
+            ["rank" => 51, "domain" => "digicert.com"],
+            ["rank" => 52, "domain" => "yahoo.com"],
+            ["rank" => 53, "domain" => "appsflyersdk.com"],
+            ["rank" => 54, "domain" => "cloudfront.net"],
+            ["rank" => 55, "domain" => "domaincontrol.com"],
+            ["rank" => 56, "domain" => "adobe.com"],
+            ["rank" => 57, "domain" => "s-msedge.net"],
+            ["rank" => 58, "domain" => "goo.gl"],
+            ["rank" => 59, "domain" => "windows.net"],
+            ["rank" => 60, "domain" => "spotify.com"],
+            ["rank" => 61, "domain" => "vimeo.com"],
+            ["rank" => 62, "domain" => "tiktokv.com"],
+            ["rank" => 63, "domain" => "cdn77.org"],
+            ["rank" => 64, "domain" => "gvt2.com"],
+            ["rank" => 65, "domain" => "skype.com"],
+            ["rank" => 66, "domain" => "gvt1.com"],
+            ["rank" => 67, "domain" => "whatsapp.com"],
+            ["rank" => 68, "domain" => "google-analytics.com"],
+            ["rank" => 69, "domain" => "workers.dev"],
+            ["rank" => 70, "domain" => "bit.ly"],
+            ["rank" => 71, "domain" => "msn.com"],
+            ["rank" => 72, "domain" => "wordpress.com"],
+            ["rank" => 73, "domain" => "zoom.us"],
+            ["rank" => 74, "domain" => "bytefcdn-oversea.com"],
+            ["rank" => 75, "domain" => "wac-msedge.net"],
+            ["rank" => 76, "domain" => "nic.ru"],
+            ["rank" => 77, "domain" => "cloudflare.net"],
+            ["rank" => 78, "domain" => "office365.com"],
+            ["rank" => 79, "domain" => "yandex.net"],
+            ["rank" => 80, "domain" => "tiktok.com"],
+            ["rank" => 81, "domain" => "gandi.net"],
+            ["rank" => 82, "domain" => "ntp.org"],
+            ["rank" => 83, "domain" => "roblox.com"],
+            ["rank" => 84, "domain" => "qq.com"],
+            ["rank" => 85, "domain" => "edgekey.net"],
+            ["rank" => 86, "domain" => "ytimg.com"],
+            ["rank" => 87, "domain" => "blogspot.com"],
+            ["rank" => 88, "domain" => "cloudflare-dns.com"],
+            ["rank" => 89, "domain" => "mozilla.org"],
+            ["rank" => 90, "domain" => "tiktokcdn-eu.com"],
+            ["rank" => 91, "domain" => "reddit.com"],
+            ["rank" => 92, "domain" => "opera.com"],
+            ["rank" => 93, "domain" => "e2ro.com"],
+            ["rank" => 94, "domain" => "unity3d.com"],
+            ["rank" => 95, "domain" => "cdninstagram.com"],
+            ["rank" => 96, "domain" => "x.com"],
+            ["rank" => 97, "domain" => "googleadservices.com"],
+            ["rank" => 98, "domain" => "baidu.com"],
+            ["rank" => 99, "domain" => "europa.eu"],
+            ["rank" => 100, "domain" => "snapchat.com"],
+            ["rank" => 101, "domain" => "samsung.com"],
+            ["rank" => 102, "domain" => "intuit.com"],
+            ["rank" => 103, "domain" => "bytefcdn-ttpeu.com"],
+            ["rank" => 104, "domain" => "amazon-adsystem.com"],
+            ["rank" => 105, "domain" => "googledomains.com"],
+            ["rank" => 106, "domain" => "ax-msedge.net"],
+            ["rank" => 107, "domain" => "mts.ru"],
+            ["rank" => 108, "domain" => "t.me"],
+            ["rank" => 109, "domain" => "a2z.com"],
+            ["rank" => 110, "domain" => "dropbox.com"],
+            ["rank" => 111, "domain" => "wa.me"],
+            ["rank" => 112, "domain" => "outlook.com"],
+            ["rank" => 113, "domain" => "nih.gov"],
+            ["rank" => 114, "domain" => "macromedia.com"],
+            ["rank" => 115, "domain" => "vk.com"],
+            ["rank" => 116, "domain" => "rocket-cdn.com"],
+            ["rank" => 117, "domain" => "tumblr.com"],
+            ["rank" => 118, "domain" => "gravatar.com"],
+            ["rank" => 119, "domain" => "github.io"],
+            ["rank" => 120, "domain" => "ui.com"],
+            ["rank" => 121, "domain" => "app-measurement.com"],
+            ["rank" => 122, "domain" => "adnxs.com"],
+            ["rank" => 123, "domain" => "msedge.net"],
+            ["rank" => 124, "domain" => "aiv-cdn.net"],
+            ["rank" => 125, "domain" => "edgesuite.net"],
+            ["rank" => 126, "domain" => "cdnjs.cloudflare.com"],
+            ["rank" => 127, "domain" => "cisco.com"],
+            ["rank" => 128, "domain" => "godaddy.com"],
+            ["rank" => 129, "domain" => "gstaticcnapps.com"],
+            ["rank" => 130, "domain" => "arxiv.org"],
+            ["rank" => 131, "domain" => "twimg.com"],
+            ["rank" => 132, "domain" => "canva.com"],
+            ["rank" => 133, "domain" => "ntp00.org"],
+            ["rank" => 134, "domain" => "mit.edu"],
+            ["rank" => 135, "domain" => "discord.com"],
+            ["rank" => 136, "domain" => "adservice.google.com"],
+            ["rank" => 137, "domain" => "akamaiedge-staging.net"],
+            ["rank" => 138, "domain" => "grammarly.com"],
+            ["rank" => 139, "domain" => "python.org"],
+            ["rank" => 140, "domain" => "ph1.support.vzw.co"],
+            ["rank" => 141, "domain" => "chase.com"],
+            ["rank" => 142, "domain" => "alicdn.com"],
+            ["rank" => 143, "domain" => "rsyslog.com"],
+            ["rank" => 144, "domain" => "stackexchange.com"],
+            ["rank" => 145, "domain" => "flickr.com"],
+            ["rank" => 146, "domain" => "pki.goog"],
+            ["rank" => 147, "domain" => "nist.gov"],
+            ["rank" => 148, "domain" => "dnsowl.com"],
+            ["rank" => 149, "domain" => "archive.org"],
+            ["rank" => 150, "domain" => "internetarchive.org"],
 
-        if (!file_exists($filePath)) {
-            $this->command->error("File top-1m.csv not found in storage/app/");
-            return;
-        }
+        ];
 
-        $handle = fopen($filePath, 'r');
-        if ($handle === false) {
-            $this->command->error("Failed to open the file.");
-            return;
-        }
-
-        $websiteCount = 0;
-
-        while (($line = fgetcsv($handle)) !== false && $websiteCount < $maxWebsites) {
-            $rank = $line[0];
-            $domain = $line[1];
+        foreach ($websites as $site) {
             $categoryId = rand(1, 9); // Random category ID between 1 and 9
-
             $website = Website::create([
-                'rank' => $rank,
-                'previous_rank' => intval($rank) + rand(-1, 1),
-                'domain' => $domain,
-                'name' => ucfirst(explode('.', $domain)[0]),
+                'rank' => $site['rank'],
+                'previous_rank' => $site['rank'] + rand(-1, 1),
+                'domain' => $site['domain'],
+                'name' => ucfirst(explode('.', $site['domain'])[0]),
                 'rating' => rand(0, 50) / 10,
                 'category_id' => $categoryId,
             ]);
@@ -43,7 +178,7 @@ class WebsiteSeeder extends Seeder
             Contact::create([
                 'website_id' => $website->id,
                 'type' => 'email',
-                'value' => 'contact' . $rank . '@' . $domain,
+                'value' => 'contact' . $site['rank'] . '@' . $site['domain'],
                 'user_id' => 1,
             ]);
 
@@ -53,11 +188,8 @@ class WebsiteSeeder extends Seeder
                 'value' => '+123456789' . rand(1000, 9999),
                 'user_id' => 1,
             ]);
-
-            $websiteCount++;
         }
 
-        fclose($handle);
-        $this->command->info("Inserted $websiteCount websites.");
+        $this->command->info("Inserted 150 websites successfully.");
     }
 }
