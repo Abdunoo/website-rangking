@@ -4,6 +4,7 @@ import router from './router'
 import Toast, { POSITION } from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
 import { createPinia } from 'pinia';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 
 const app = createApp(App)
