@@ -56,26 +56,9 @@
                         <td class="py-3">{{ credit.created_at }}</td>
                         <td class="py-3">
                             <div class="relative inline-block text-left">
-                                <button class="text-blue-600 hover:text-blue-800" @click="toggleMenu(credit.id)">
-                                    Details
-                                </button>
+                                <button @click="approveCredit(credit.id)"
+                                    class="text-green-600 hover:bg-green-100 rounded-md px-2 py-1">Approve</button>
 
-                                <div v-if="activeMenuId === credit.id"
-                                    class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                                    <div class="py-2">
-                                        <p class="px-4 text-gray-700">Do you want to approve or reject the credit?</p>
-                                        <div class="flex justify-between px-4 py-2">
-                                            <button @click="approveCredit(credit.id)"
-                                                class="text-green-600 hover:bg-green-100 rounded-md px-2 py-1">Approve</button>
-                                            <button @click="rejectCredit(credit.id)"
-                                                class="text-red-600 hover:bg-red-100 rounded-md px-2 py-1">Reject</button>
-                                        </div>
-                                        <div class="px-4 py-1">
-                                            <button @click="toggleMenu(null)"
-                                                class="text-gray-600 hover:bg-gray-200 rounded-md px-2 py-1">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </td>
                     </tr>
@@ -94,7 +77,8 @@
     <transition name="fade">
         <div v-if="isModalVisible" class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10">
             <div @click="closeModal" class="fixed bg-black opacity-70 inset-0 z-0"></div>
-            <div class="w-full max-w-lg p-6 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
+            <div
+                class="w-full max-w-lg p-6 relative max-h-full flex items-center mx-auto my-auto rounded-xl shadow-lg bg-white">
                 <form @submit.prevent="addUserCredit" class="w-full">
                     <div class="flex-auto leading-6">
                         <h2 class="text-center text-xl font-bold mb-4">Add Amount User</h2>
@@ -105,7 +89,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">User </label>
-                            <input v-model="search" type="text" @input="searchUser (search)"
+                            <input v-model="search" type="text" @input="searchUser(search)"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary mb-2" />
                             <select v-model="creditForm.userId"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
@@ -117,7 +101,8 @@
                         <button type="submit" class="mb-2 btn btn-primary px-4 py-2 rounded-md">
                             {{ 'Add Credits Amount' }}
                         </button>
-                        <button type="button" @click="isModalVisible = false" class="mb-2 btn btn-danger px-4 py-2 rounded-md">Close</button>
+                        <button type="button" @click="isModalVisible = false"
+                            class="mb-2 btn btn-danger px-4 py-2 rounded-md">Close</button>
                     </div>
                 </form>
             </div>
@@ -187,6 +172,7 @@ export default {
                     getLstCredits();
                 }
             } catch (error) {
+                toast.error(error.response.data.message || 'Error approving credit')
                 console.error(error);
             }
             state.activeMenuId = null;
