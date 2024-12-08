@@ -11,7 +11,7 @@ export default defineConfig({
     vue(),
     VitePluginVueDevTools(),
     sitemapPlugin({
-      hostname: 'https://sandbox2.panemu.com/rank/',
+      hostname: 'https://sandbox2.panemu.com',
       routes: [
         '/', '/:domain', '/profile', '/change-password', '/register', '/login',
         '/buy'
@@ -34,21 +34,21 @@ export default defineConfig({
         theme_color: "#0d7cf2",
         background_color: "#ffffff",
         display: "standalone",
-        start_url: "/rank/",
-        id: "/rank/",
+        start_url: "/",
+        id: "/",
         icons: [
           {
-            src: "/rank/assets/images/logo_192x192.webp",
+            src: "/assets/images/logo_192x192.webp",
             sizes: "192x192",
             type: "image/webp",
           },
           {
-            src: "/rank/assets/images/logo_512x512.webp",
+            src: "/assets/images/logo_512x512.webp",
             sizes: "512x512",
             type: "image/webp",
           },
           {
-            src: "/rank/assets/images/logo_512x512_maskable.webp",
+            src: "/assets/images/logo_512x512_maskable.webp",
             sizes: "512x512",
             type: "image/webp",
             purpose: "any maskable",
@@ -113,7 +113,7 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  base: "/rank/",
+  base: "/",
   build: {
     target: 'esnext',
     minify: 'terser',

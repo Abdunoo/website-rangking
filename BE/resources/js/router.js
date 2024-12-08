@@ -68,19 +68,19 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory('/rank/api'),
+    history: createWebHistory(),
     routes,
 });
 
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = !!localStorage.getItem('token'); // Check for a token
+// router.beforeEach((to, from, next) => {
+//     const isAuthenticated = !!localStorage.getItem('token'); // Check for a token
 
-    if (to.path === '/login' && isAuthenticated) {
-        next('/dashboard'); // Redirect logged-in users to the dashboard
-    } else {
-        next();
-    }
-});
+//     if (to.path === '/login' && isAuthenticated) {
+//         next('/dashboard'); // Redirect logged-in users to the dashboard
+//     } else {
+//         next();
+//     }
+// });
 
 
 export default router;

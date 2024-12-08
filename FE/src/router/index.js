@@ -45,7 +45,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory("/rank"),
+  history: createWebHistory(),
   routes,
 });
 
