@@ -70,11 +70,13 @@ class AdminController extends Controller
         $totalWebsites = Website::count();
         $activeRankings = Website::count();
         $categoriesCount = DB::table('categories')->count();
-        $monthlyVisitors = 25400;
+        $startDate = Carbon::now()->startOfMonth();
+        $monthlyVisitors = WebsiteTrends::where('created_at', '>=', $startDate)
+            ->distinct('user_id')
+            ->count('user_id');
 
         $stats = [
             ['title' => 'Total Websites', 'value' => $totalWebsites],
-            ['title' => 'Active Rankings', 'value' => $activeRankings],
             ['title' => 'Categories', 'value' => $categoriesCount],
             ['title' => 'Monthly Visitors', 'value' => number_format($monthlyVisitors)],
         ];

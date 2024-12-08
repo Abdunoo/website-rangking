@@ -2,10 +2,13 @@
     <div class="space-y-6">
         <h1 class="text-2xl font-bold">Dashboard</h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div v-for="stat in stats" :key="stat.title" class="card">
-                <h3 class="text-gray-500">{{ stat.title }}</h3>
-                <p class="text-2xl font-bold mt-2">{{ stat.value }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div v-for="stat in stats" :key="stat.title" class="card flex items-center">
+                <i :class="stat.iconClass + ' text-gray-500 mr-2'" aria-hidden="true"></i> <!-- Font Awesome icon -->
+                <div>
+                    <h3 class="text-gray-500">{{ stat.title }}</h3>
+                    <p class="text-2xl font-bold mt-2">{{ stat.value }}</p>
+                </div>
             </div>
         </div>
 
@@ -104,10 +107,9 @@ export default {
         });
 
         const stats = ref([
-            { title: 'Total Websites', value: '0' },
-            { title: 'Active Rankings', value: '0' },
-            { title: 'Categories', value: '0' },
-            { title: 'Monthly Visitors', value: '0' }
+            { title: 'Total Websites', value: '0', iconClass: 'fas fa-globe' }, // Globe icon for websites
+            { title: 'Categories', value: '0', iconClass: 'fas fa-th-list' }, // List icon for categories
+            { title: 'Monthly Visitors', value: '0', iconClass: 'fas fa-users' } // Users icon for visitors
         ]);
 
         const fetchDataState = async () => {
