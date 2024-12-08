@@ -16,4 +16,5 @@ export default defineConfig({
             '@': resolve(__dirname, 'resources/js'),
         },
     },
+    base: '/rank/api',
 });

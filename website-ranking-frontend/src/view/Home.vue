@@ -60,12 +60,12 @@
 <script>
 import apiClient from '@/helpers/axios';
 import router from '@/router';
-import { onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from 'vue';
+import { defineAsyncComponent, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from 'vue';
 import { ArrowUpIcon } from '@heroicons/vue/24/solid';
 import { debounce } from 'lodash-es';
-import WebsiteCard from '@/components/WebsiteCard.vue';
 import { useDataStore } from '@/store/dataStore';
-import PaginationButtons from '@/components/ui/PaginationButtons.vue';
+const PaginationButtons = defineAsyncComponent(() => import('@/components/ui/PaginationButtons.vue'));
+const WebsiteCard = defineAsyncComponent(() => import('@/components/WebsiteCard.vue'));
 
 export default {
   name: 'Home',

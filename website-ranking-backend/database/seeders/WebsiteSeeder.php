@@ -11,7 +11,7 @@ class WebsiteSeeder extends Seeder
     public function run()
     {
         $filePath = storage_path('app/top-1m.csv');
-        $maxWebsites = 10000;
+        $maxWebsites = 150;
 
         if (!file_exists($filePath)) {
             $this->command->error("File top-1m.csv not found in storage/app/");

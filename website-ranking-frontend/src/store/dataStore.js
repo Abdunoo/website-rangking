@@ -55,9 +55,6 @@ export const useDataStore = defineStore('data', {
     },
     setLoading(value) {
       this.loading = value;
-      console.log(
-        'setLoading', value
-      )
     },
   },
 });

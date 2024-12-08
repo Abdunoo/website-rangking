@@ -15,7 +15,7 @@ class WebsiteTrendsSeeder extends Seeder
     {
         $data = [];
 
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $randomDate = Carbon::now()
                 ->subMonths(rand(0, 5)) // Ambil bulan acak dalam 6 bulan terakhir
                 ->subDays(rand(0, 30))  // Ambil hari acak dalam bulan tersebut
@@ -23,7 +23,7 @@ class WebsiteTrendsSeeder extends Seeder
 
             $data[] = [
                 'website_id' => rand(1, 5),
-                'user_id' => rand(1, 100),
+                'user_id' => rand(1, 10),
                 'created_at' => $randomDate,
                 'updated_at' => $randomDate->copy()->addDays(rand(0, 10)), // Tambahkan 0-10 hari ke updated_at
             ];

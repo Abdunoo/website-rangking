@@ -1,7 +1,7 @@
 <script>
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Button from '@/components/ui/Button.vue'
+const Button = defineAsyncComponent(() => import('@/components/ui/Button.vue'));
 import axios from 'axios'
 import apiClient from '@/helpers/axios';
 import { useDataStore } from '@/store/dataStore';

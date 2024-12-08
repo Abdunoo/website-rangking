@@ -1,10 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import Header from './components/Header.vue';
 import BottomMenu from './components/BottomMenu.vue';
-import LoadingIndicator from '@/components/ui/LoadingIndicator.vue'
 import { useDataStore } from './store/dataStore';
-
+const LoadingIndicator = defineAsyncComponent(() => import('@/components/ui/LoadingIndicator.vue'));
 const dataStore = useDataStore();
 </script>
 

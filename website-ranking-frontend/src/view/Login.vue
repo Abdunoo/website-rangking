@@ -46,12 +46,12 @@
 </template>
 
 <script>
-import { reactive, ref, toRefs } from 'vue'
+import { defineAsyncComponent, reactive, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import Button from '@/components/ui/Button.vue'
 import apiClient from '@/helpers/axios';
 import { useDataStore } from '@/store/dataStore.js';
 import { useToast } from 'vue-toastification';
+const Button = defineAsyncComponent(() => import('@/components/ui/Button.vue'));
 
 export default {
   components: {
