@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import laravel from 'laravel-vite-plugin';
 
 export default defineConfig({
+    base: '/api/',
     plugins: [
         vue(),
         laravel({
