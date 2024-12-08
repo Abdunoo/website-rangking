@@ -18,6 +18,7 @@
             Ranking Update Frequency
           </label>
           <select class="input">
+            <option>Manual</option>
             <option>Daily</option>
             <option>Weekly</option>
             <option>Monthly</option>

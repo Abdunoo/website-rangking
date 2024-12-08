@@ -25,15 +25,6 @@
 
             <button class="btn btn-primary" type="submit" fullWidth>Login</button>
         </form>
-
-        <div class="mt-4 text-center">
-            <p class="text-sm text-gray-600">
-                Don't have an account?
-                <RouterLink to="/register" class="text-primary hover:underline">
-                    Register
-                </RouterLink>
-            </p>
-        </div>
     </div>
 </template>
 
