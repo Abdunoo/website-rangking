@@ -12,6 +12,10 @@ import Login from './views/Login.vue';
 const routes = [
     {
         path: '/',
+        redirect: '/dashboard',
+    },
+    {
+        path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard,
     },
@@ -72,7 +76,7 @@ router.beforeEach((to, from, next) => {
     const isAuthenticated = !!localStorage.getItem('token'); // Check for a token
 
     if (to.path === '/login' && isAuthenticated) {
-        next('/'); // Redirect logged-in users to the dashboard
+        next('/dashboard'); // Redirect logged-in users to the dashboard
     } else {
         next();
     }

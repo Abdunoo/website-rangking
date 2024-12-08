@@ -46,7 +46,7 @@ const route = useRoute();
 const router = useRouter();
 
 const menuItems = [
-    { name: 'Dashboard', icon: ChartBarIcon, path: '/' },
+    { name: 'Dashboard', icon: ChartBarIcon, path: '/dashboard' },
     { name: 'Websites', icon: GlobeAltIcon, path: '/websites' },
     { name: 'Categories', icon: TagIcon, path: '/categories' },
     { name: 'Rankings', icon: ChartPieIcon, path: '/rankings' },

@@ -8,8 +8,8 @@ import Toast, { POSITION } from 'vue-toastification';
 import '@fortawesome/fontawesome-free/css/all.css';
 import 'vue-toastification/dist/index.css';
 
-const app = createApp(App);
 const pinia = createPinia();
+const app = createApp(App);
 
 app.use(Toast, {
     position: "top-right",

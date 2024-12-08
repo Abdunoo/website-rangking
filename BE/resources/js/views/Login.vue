@@ -69,7 +69,7 @@ export default {
                     toast.success('Login Success')
                     localStorage.setItem('token', response.data.token);
                     localStorage.setItem('_usr', JSON.stringify(response.data.user));
-                    router.push('/')
+                    router.push('/dashboard')
                 } else {
                     state.errorMessage = 'Invalid credentials'
                 }
