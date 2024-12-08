@@ -219,7 +219,11 @@ class WebsiteController extends Controller
     public function update(Request $request, Website $website)
     {
         $request->validate([
+            'name' => 'required',
+            'category_id' => 'required',
             'domain' => 'required|string|max:255|unique:websites,domain,' . $website->id,
+            'email' => 'sometimes|required|string|email|max:255,value,' .($request->input('email') ?? $website->contacts->firstWhere('type', 'phone')->value ?? ''),
+            'phone' => 'sometimes|required|string|max:20,value,' .($request->input('phone') ?? $website->contacts->firstWhere('type', 'email')->value ?? ''),
         ]);
 
         $website->update($request->all());
