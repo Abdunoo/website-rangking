@@ -23,7 +23,7 @@
                         <td class="py-3">
                             <span class="badge badge-success">{{ user.role }}</span>
                         </td>
-                        <td class="py-3">{{ user.created_at }}</td>
+                        <td class="py-3">{{ formatDate(user.created_at) }}</td>
                         <td class="py-3">
                             <button v-on:click="showEditUserModal(user)" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
                         </td>
@@ -153,6 +153,23 @@ export default {
             dataStore.setLoading(false);
         };
 
+        const formatDate = (datetime) => {
+            const date = new Date(datetime);
+
+            // Convert to US format: MM/DD/YYYY, HH:mm:ss AM/PM
+            const options = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true, // Enables AM/PM format
+            };
+
+            return date.toLocaleString("en-US", options);
+        }
+
         onMounted(() => {
             getUsers();
         });
@@ -164,6 +181,7 @@ export default {
             closeModal,
             createUser ,
             updateUser ,
+            formatDate,
         };
     }
 }

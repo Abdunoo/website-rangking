@@ -53,7 +53,7 @@
                                 {{ credit.status }}
                             </span>
                         </td>
-                        <td class="py-3">{{ credit.created_at }}</td>
+                        <td class="py-3">{{ formatDate(credit.created_at) }}</td>
                         <td class="py-3">
                             <div class="relative inline-block text-left">
                                 <button @click="approveCredit(credit.id)"
@@ -232,6 +232,23 @@ export default {
             }
         };
 
+        const formatDate = (datetime) => {
+            const date = new Date(datetime);
+
+            // Convert to US format: MM/DD/YYYY, HH:mm:ss AM/PM
+            const options = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true, // Enables AM/PM format
+            };
+
+            return date.toLocaleString("en-US", options);
+        }
+
         onMounted(() => {
             getLstCredits();
         })
@@ -245,6 +262,7 @@ export default {
             prevPage,
             addUserCredit,
             searchUser,
+            formatDate,
         }
 
     }

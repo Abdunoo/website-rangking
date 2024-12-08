@@ -35,7 +35,7 @@
                                 {{ review.is_approved === 1 ? 'Approved' : 'Pending' }}
                             </span>
                         </td>
-                        <td class="py-3">{{ review.created_at }}</td>
+                        <td class="py-3">{{ formatDate(review.created_at) }}</td>
                         <td class="py-3 space-x-2">
                             <button class="text-emerald-600 hover:text-emerald-800" @click="approveReview(review.id)">
                                 Approve
@@ -182,6 +182,23 @@ export default {
             }
         };
 
+        const formatDate = (datetime) => {
+            const date = new Date(datetime);
+
+            // Convert to US format: MM/DD/YYYY, HH:mm:ss AM/PM
+            const options = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true, // Enables AM/PM format
+            };
+
+            return date.toLocaleString("en-US", options);
+        }
+
         onMounted(() => {
             getLstReviews();
         })
@@ -194,6 +211,7 @@ export default {
             rejectReview,
             updateAllReview,
             showModalUpdate,
+            formatDate,
         }
 
     }
